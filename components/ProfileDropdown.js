@@ -1,16 +1,21 @@
-// components/ProfileDropdown.js
-import React, { useEffect, useState } from 'react';
-import { supabase } from '../supabaseClient';
+// components/ui/ProfileDropdown.js
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
+import { supabase } from '../../supabaseClient';
 
 export default function ProfileDropdown() {
   const [session, setSession] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
-    });
+    };
+
+    getSession();
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
@@ -26,17 +31,36 @@ export default function ProfileDropdown() {
     router.push('/login');
   };
 
-  if (!session) return null;
-
   return (
-    <div className="ml-4">
-      <span className="mr-2 text-sm text-gray-600">{session.user.email}</span>
+    <div className="relative ml-4">
       <button
-        onClick={handleLogout}
-        className="text-sm bg-red-100 text-red-600 px-3 py-1 rounded hover:bg-red-200"
+        onClick={() => setDropdownOpen(!dropdownOpen)}
+        className="text-gray-700 hover:text-blue-600 text-sm"
       >
-        Log Out
+        Menu ▾
       </button>
+
+      {dropdownOpen && (
+        <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow z-50">
+          {session ? (
+            <>
+              <Link href="/dashboard" className="block px-4 py-2 hover:bg-gray-100">Dashboard</Link>
+              <Link href="/profile" className="block px-4 py-2 hover:bg-gray-100">Profile</Link>
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500"
+              >
+                Log Out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="block px-4 py-2 hover:bg-gray-100">Log In</Link>
+              <Link href="/signup" className="block px-4 py-2 hover:bg-gray-100">Sign Up</Link>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
