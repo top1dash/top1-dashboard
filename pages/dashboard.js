@@ -1,3 +1,4 @@
+// pages/dashboard.js
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../supabaseClient';
@@ -6,6 +7,7 @@ export default function Dashboard() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sessionEmail, setSessionEmail] = useState(null);
+  const [showWelcome, setShowWelcome] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -15,12 +17,18 @@ export default function Dashboard() {
       } = await supabase.auth.getSession();
 
       if (!session || !session.user) {
-        router.push('/login'); // 🚪 Send to login if not logged in
+        router.push('/login');
         return;
       }
 
       const userEmail = session.user.email;
       setSessionEmail(userEmail);
+
+      // Show welcome banner on first signup visit
+      if (router?.query?.newSignup === 'true') {
+        setShowWelcome(true);
+        setTimeout(() => setShowWelcome(false), 4000);
+      }
 
       const { data, error } = await supabase
         .from('rankings')
@@ -42,6 +50,12 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-6xl mx-auto">
+        {showWelcome && (
+          <div className="text-center text-white bg-green-500 py-3 px-4 rounded mb-6 text-lg font-semibold shadow">
+            👋 Welcome! You’re now signed up and logged in.
+          </div>
+        )}
+
         <h1 className="text-3xl font-bold mb-6">Welcome, Austin!</h1>
 
         {loading ? (
@@ -50,7 +64,9 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="bg-white rounded-2xl shadow p-6">
               <h2 className="text-xl font-semibold mb-2">Your Chance of Divorce</h2>
-              <p className="text-4xl font-bold text-blue-500">{userData ? `${(userData.total_score * 100).toFixed(0)}%` : '...'}</p>
+              <p className="text-4xl font-bold text-blue-500">
+                {userData ? `${(userData.total_score * 100).toFixed(0)}%` : '...'}
+              </p>
             </div>
 
             <div className="bg-white rounded-2xl shadow p-6">
