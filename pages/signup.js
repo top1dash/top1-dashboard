@@ -6,13 +6,12 @@ import { supabase } from '../supabaseClient';
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
   const router = useRouter();
 
   useEffect(() => {
     const checkSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         router.push('/dashboard');
       }
@@ -23,12 +22,10 @@ export default function Signup() {
   const handleSignup = async (e) => {
     e.preventDefault();
     const { error } = await supabase.auth.signUp({ email, password });
-
     if (error) {
-      alert(error.message);
+      setErrorMsg(error.message);
     } else {
-      // ✅ New users go straight to dashboard with welcome banner
-      router.push('/dashboard?welcome=true');
+      router.push('/dashboard');
     }
   };
 
@@ -53,15 +50,21 @@ export default function Signup() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full mb-4 p-3 border rounded-md"
+          className="w-full mb-2 p-3 border rounded-md"
           required
         />
 
-        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded">
+        {errorMsg && (
+          <p className="text-red-500 text-sm mb-4">{errorMsg}</p>
+        )}
+
+        <button
+          type="submit"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition"
+        >
           Sign Up
         </button>
       </form>
     </div>
   );
 }
-
