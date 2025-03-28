@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
-import { Card } from "../components/card";
-import { CardContent } from "../components/cardContent";
+import { Card } from "../components/ui/card";
+import { CardContent } from "../components/ui/cardContent";
 import { useSearchParams } from "next/navigation";
 
 const mockData = [
