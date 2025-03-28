@@ -41,13 +41,13 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="bg-white rounded-2xl shadow p-6">
               <h2 className="text-xl font-semibold mb-2">Your Chance of Divorce</h2>
-              <p className="text-4xl font-bold text-blue-500">{userData ? `${(userData.total_score * 100).toFixed(1)}%` : '...'}</p>
+              <p className="text-4xl font-bold text-blue-500">{userData ? `${(userData.total_score * 100).toFixed(0)}%` : '...'}</p>
             </div>
 
             <div className="bg-white rounded-2xl shadow p-6">
               <h2 className="text-xl font-semibold mb-2">Your Percentile Rank</h2>
               <p className="text-4xl font-bold text-green-500">
-                {(userData.percentile_rank * 100).toFixed(1)}%
+                {(userData.percentile_rank * 100).toFixed(0)}%
               </p>
               <p className="text-sm text-gray-500 mt-1">You’re in the top {userData.rank}</p>
             </div>
