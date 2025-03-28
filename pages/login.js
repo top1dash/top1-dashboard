@@ -9,6 +9,17 @@ export default function Login() {
   const [errorMsg, setErrorMsg] = useState('');
   const router = useRouter();
 
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        router.push('/dashboard');
+      }
+    };
+    checkSession();
+  }, []);
+
+  
   const handleLogin = async (e) => {
     e.preventDefault();
 
