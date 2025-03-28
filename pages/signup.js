@@ -8,6 +8,16 @@ export default function Signup() {
   const [password, setPassword] = useState('');
   const router = useRouter();
 
+  useEffect(() => {
+  const checkSession = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      router.push('/dashboard');
+    }
+  };
+  checkSession();
+}, []);
+
   const handleSignup = async (e) => {
     e.preventDefault();
     const { error } = await supabase.auth.signUp({ email, password });
