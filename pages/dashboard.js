@@ -1,16 +1,27 @@
-// pages/dashboard.js
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import { supabase } from '../supabaseClient';
 
 export default function Dashboard() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // TEMP: Replace with real user email from auth or context
-  const userEmail = 'yoyo@mmmmail.com';
+  const [sessionEmail, setSessionEmail] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const getUserSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session || !session.user) {
+        router.push('/login'); // 🚪 Send to login if not logged in
+        return;
+      }
+
+      const userEmail = session.user.email;
+      setSessionEmail(userEmail);
+
       const { data, error } = await supabase
         .from('rankings')
         .select('total_score, rank, percentile_rank')
@@ -18,17 +29,15 @@ export default function Dashboard() {
         .order('updated_at', { ascending: false })
         .limit(1);
 
-      if (error) {
-        console.error('Error fetching data:', error);
-      } else {
+      if (!error) {
         setUserData(data[0]);
       }
 
       setLoading(false);
     };
 
-    fetchData();
-  }, [userEmail]);
+    getUserSession();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -54,7 +63,7 @@ export default function Dashboard() {
 
             <div className="bg-white rounded-2xl shadow p-6">
               <h2 className="text-xl font-semibold mb-2">Email Linked</h2>
-              <p className="text-md text-gray-700">{userEmail}</p>
+              <p className="text-md text-gray-700">{sessionEmail}</p>
             </div>
           </div>
         ) : (
