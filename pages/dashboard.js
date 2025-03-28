@@ -1,72 +1,41 @@
-
-import { useEffect, useState } from "react";
-import { Card } from "../components/ui/card";
-import { CardContent } from "../components/ui/cardContent";
-import { useSearchParams } from "next/navigation";
-
-const mockData = [
-  {
-    email: "cherry@hotmail.com",
-    name: "Austin",
-    chanceOfDivorce: 5.1,
-    percentileRank: 38.5,
-  },
-  {
-    email: "hello@ymail.com",
-    name: "sweet",
-    chanceOfDivorce: 60,
-    percentileRank: 61.5,
-  },
-  {
-    email: "hello@googleface.com",
-    name: "Bubba",
-    chanceOfDivorce: 105,
-    percentileRank: 69.2,
-  },
-];
+// pages/dashboard.js
+import React from 'react';
 
 export default function Dashboard() {
-  const searchParams = useSearchParams();
-  const emailParam = searchParams.get("email");
-
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    if (emailParam) {
-      const found = mockData.find((item) => item.email === emailParam);
-      setUser(found);
-    }
-  }, [emailParam]);
-
-  if (!user) {
-    return <div className="p-4 text-center">User not found. Please check your link.</div>;
-  }
+  // Sample mock data; will be dynamic later
+  const user = {
+    name: "Austin",
+    email: "cherry@hotmail.com",
+    divorceChance: "5.1%",
+    percentile: "38.5%",
+    rank: "Top 38.5% of users",
+  };
 
   return (
-    <div className="p-6 max-w-xl mx-auto space-y-4">
-      <h1 className="text-2xl font-bold text-center">Welcome, {user.name}!</h1>
+    <div className="min-h-screen bg-gray-100 p-6">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">Welcome, {user.name}!</h1>
 
-      <Card>
-        <CardContent className="p-4">
-          <h2 className="text-lg font-semibold">Your Chance of Divorce</h2>
-          <p className="text-3xl text-red-600 font-bold">{user.chanceOfDivorce}%</p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="p-4">
-          <h2 className="text-lg font-semibold">Your Percentile Rank</h2>
-          <div className="w-full bg-gray-200 h-4 rounded-full overflow-hidden">
-            <div
-              className="h-4 bg-green-500 rounded-full"
-              style={{ width: `${user.percentileRank}%` }}
-            ></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-white rounded-2xl shadow p-6">
+            <h2 className="text-xl font-semibold mb-2">Your Chance of Divorce</h2>
+            <p className="text-4xl font-bold text-blue-500">{user.divorceChance}</p>
           </div>
-          <p className="mt-2 text-sm text-gray-600">
-            You're in the top {user.percentileRank}% of users
-          </p>
-        </CardContent>
-      </Card>
+
+          <div className="bg-white rounded-2xl shadow p-6">
+            <h2 className="text-xl font-semibold mb-2">Your Percentile Rank</h2>
+            <p className="text-4xl font-bold text-green-500">{user.percentile}</p>
+            <p className="text-sm text-gray-500 mt-1">You're in the {user.rank}</p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow p-6">
+            <h2 className="text-xl font-semibold mb-2">Email Linked</h2>
+            <p className="text-md text-gray-700">{user.email}</p>
+          </div>
+        </div>
+
+        <p className="text-sm text-gray-400 mt-10">More personalized metrics coming soon...</p>
+      </div>
     </div>
   );
 }
