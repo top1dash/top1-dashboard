@@ -1,9 +1,28 @@
 // components/Navbar.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import ProfileDropdown from './ProfileDropdown';
+import { supabase } from '../supabaseClient';
 
 export default function Navbar() {
+  const [session, setSession] = useState(null);
+
+  useEffect(() => {
+    // Get current session on mount
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    // Listen for auth changes
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
   return (
     <nav className="bg-white shadow p-4 flex justify-between items-center">
       <div className="text-2xl font-bold">
@@ -14,14 +33,19 @@ export default function Navbar() {
         <Link href="/dashboard" className="text-gray-700 hover:text-blue-600">
           Dashboard
         </Link>
-        <Link href="/login" className="text-gray-700 hover:text-blue-600">
-          Login
-        </Link>
-        <Link href="/signup" className="text-gray-700 hover:text-blue-600">
-          Sign Up
-        </Link>
 
-        {/* ProfileDropdown will handle showing/hiding based on auth */}
+        {!session && (
+          <>
+            <Link href="/login" className="text-gray-700 hover:text-blue-600">
+              Login
+            </Link>
+            <Link href="/signup" className="text-gray-700 hover:text-blue-600">
+              Sign Up
+            </Link>
+          </>
+        )}
+
+        {/* Shows user's email + logout when logged in */}
         <ProfileDropdown />
       </div>
     </nav>
