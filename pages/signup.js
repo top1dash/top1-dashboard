@@ -24,8 +24,7 @@ export default function Signup() {
     if (error) {
       alert(error.message);
     } else {
-      alert('Account created! Please log in.');
-      router.push('/login');
+      router.push('/login?newSignup=true');
     }
   };
 
