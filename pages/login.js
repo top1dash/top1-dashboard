@@ -7,7 +7,6 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
-  const [signupSuccess, setSignupSuccess] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -20,11 +19,6 @@ export default function Login() {
       }
     };
     checkSession();
-    if (router?.query?.newSignup === 'true') {
-  setSignupSuccess(true);
-}
-
-
   }, []);
 
   const handleLogin = async (e) => {
@@ -38,7 +32,7 @@ export default function Login() {
     if (error) {
       setErrorMsg(error.message);
     } else {
-      router.push('/dashboard'); // ✅ Redirect on success
+      router.push('/dashboard');
     }
   };
 
@@ -51,13 +45,6 @@ export default function Login() {
           {errorMsg && (
             <p className="text-red-500 text-sm mb-4 text-center">{errorMsg}</p>
           )}
-
-  {signupSuccess && (
-  <p className="text-green-600 text-sm mb-4 text-center">
-    ✅ Account created! Please log in below.
-  </p>
-)}
-
 
           <input
             type="email"
