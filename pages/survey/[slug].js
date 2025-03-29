@@ -26,6 +26,13 @@ export default function SurveySlugPage() {
         console.error('Error fetching survey config:', error);
       } else {
         try {
+          console.log('Survey config pulled:', data.config); // ✅ Console log here
+
+          if (!data.config) {
+            console.error('No config found in data:', data);
+            return;
+          }
+
           const parsed = JSON.parse(data.config);
           setQuestions(parsed.questions || []);
           setSurveyTitle(parsed.title || slug);
