@@ -1,51 +1,72 @@
 // pages/survey.js
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { supabase } from '../supabaseClient';
-import Navbar from '../components/Navbar';
 
 export default function SurveyPage() {
-  const [sessionEmail, setSessionEmail] = useState(null);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const [responses, setResponses] = useState({});
 
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+  const handleChange = (questionId, value) => {
+    setResponses({ ...responses, [questionId]: value });
+  };
 
-      if (!session || !session.user) {
-        router.push('/login');
-        return;
-      }
-
-      setSessionEmail(session.user.email);
-      setLoading(false);
-    };
-
-    checkSession();
-  }, [router]);
-
-  if (loading) {
-    return <p className="p-6">Loading...</p>;
-  }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('User responses:', responses);
+    // TODO: Submit to Supabase
+    router.push('/dashboard');
+  };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <Navbar />
-      <div className="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow mt-10 text-center">
-        <h1 className="text-3xl font-bold mb-4">Survey Coming Soon</h1>
-        <p className="text-gray-700 text-lg mb-4">
-          Welcome, <span className="font-semibold">{sessionEmail}</span>!
-        </p>
-        <p className="text-gray-600 mb-6">
-          This is where you'll be able to take your personalized survey and see how you compare to others.
-        </p>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white w-full max-w-2xl rounded-xl shadow-md p-8 space-y-6"
+      >
+        <h1 className="text-2xl font-bold text-center">Stage 1 Survey</h1>
 
-        {/* 🔗 Optional: add Jotform link or button here */}
-        {/* <a href="https://form.jotform.com/YOUR_FORM_ID" target="_blank" rel="noopener noreferrer" className="inline-block bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition">
-          Start Survey Now
-        </a> */}
-      </div>
+        {/* Question 1: Multiple choice */}
+        <div>
+          <label className="block text-lg font-medium mb-2">
+            Which vacation sounds more fun?
+          </label>
+          <select
+            value={responses.vacation || ''}
+            onChange={(e) => handleChange('vacation', e.target.value)}
+            className="w-full border rounded px-4 py-2"
+            required
+          >
+            <option value="" disabled>Select one</option>
+            <option value="mountains">Hiking in the mountains</option>
+            <option value="beach">Relaxing on the beach</option>
+            <option value="city">Exploring a new city</option>
+          </select>
+        </div>
+
+        {/* Question 2: Short answer */}
+        <div>
+          <label className="block text-lg font-medium mb-2">
+            What is your ideal number of kids?
+          </label>
+          <input
+            type="number"
+            min="0"
+            className="w-full border rounded px-4 py-2"
+            value={responses.kids || ''}
+            onChange={(e) => handleChange('kids', e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="text-center">
+          <button
+            type="submit"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md"
+          >
+            Submit Survey
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
