@@ -17,7 +17,7 @@ export default function SurveySlugPage() {
 
     const fetchSurvey = async () => {
       const { data, error } = await supabase
-        .from('survey.config')
+        .from('survey_config') // ✅ correct table name with underscore
         .select('config')
         .eq('survey_name', slug)
         .single();
@@ -26,19 +26,20 @@ export default function SurveySlugPage() {
         console.error('Error fetching survey config:', error);
       } else {
         try {
-          console.log('Survey config pulled:', data.config); // ✅ Console log here
+          console.log('Survey config pulled:', data.config); // ✅ debug
 
           if (!data.config) {
             console.error('No config found in data:', data);
             return;
           }
 
-          setQuestions(parsed.questions || []);
-          setSurveyTitle(parsed.title || slug);
+          setQuestions(data.config.questions || []);
+          setSurveyTitle(data.config.survey_name || slug);
         } catch (err) {
           console.error('Invalid JSON config:', err);
         }
       }
+
       setLoading(false);
     };
 
@@ -82,9 +83,9 @@ export default function SurveySlugPage() {
                 required
               >
                 <option value="" disabled>Select one</option>
-                {q.choices.map((choice) => (
-                  <option key={choice.value} value={choice.value}>
-                    {choice.label}
+                {q.options.map((option, index) => (
+                  <option key={index} value={option}>
+                    {option}
                   </option>
                 ))}
               </select>
@@ -92,16 +93,16 @@ export default function SurveySlugPage() {
 
             {q.type === 'image_choice' && (
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {q.choices.map((choice) => (
+                {q.options.map((choice, index) => (
                   <div
-                    key={choice.value}
-                    onClick={() => handleChange(q.id, choice.value)}
+                    key={index}
+                    onClick={() => handleChange(q.id, choice.label)}
                     className={`cursor-pointer border rounded-lg p-2 hover:shadow ${
-                      responses[q.id] === choice.value ? 'ring-2 ring-blue-500' : ''
+                      responses[q.id] === choice.label ? 'ring-2 ring-blue-500' : ''
                     }`}
                   >
                     <img
-                      src={choice.image}
+                      src={choice.image_url}
                       alt={choice.label}
                       className="w-full h-32 object-cover rounded"
                     />
