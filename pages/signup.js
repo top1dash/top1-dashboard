@@ -45,78 +45,103 @@ export default function Signup() {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-white px-4">
-      <form onSubmit={handleSignup} className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
+      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
         <h2 className="text-2xl font-bold mb-6 text-center">Create Account</h2>
 
-        <label className="block mb-1 text-sm font-medium">Your name</label>
-        <input
-          type="text"
-          placeholder="First and last name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full mb-4 px-4 py-2 border rounded-full text-sm"
-          required
-        />
-
-        <label className="block mb-1 text-sm font-medium">Email</label>
-        <input
-          type="email"
-          autoComplete="email"
-          placeholder="you@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full mb-4 px-4 py-2 border rounded-full text-sm"
-          required
-        />
-
-        <label className="block mb-1 text-sm font-medium">Password</label>
-        <input
-          type="password"
-          autoComplete="new-password"
-          placeholder="At least 6 characters"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-4 py-2 border rounded-full text-sm"
-          required
-        />
-        <p className="text-xs text-gray-500 mt-1 mb-3">
-          ⓘ Passwords must be at least 6 characters.
-        </p>
-
-        <label className="block mb-1 text-sm font-medium">Re-enter password</label>
-        <input
-          type="password"
-          placeholder="Re-enter password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          className="w-full mb-4 px-4 py-2 border rounded-full text-sm"
-          required
-        />
-
-        {errorMsg && (
-          <p className="text-red-500 text-sm mb-4 text-center">{errorMsg}</p>
-        )}
-
         <button
-          type="submit"
-          className="w-full bg-black text-white py-2 rounded-full text-sm hover:bg-gray-900 transition"
+          type="button"
+          className="w-full bg-yellow-400 hover:bg-yellow-500 text-black py-2 rounded-full text-sm font-medium mb-3"
         >
-          Create account
+          <span className="mr-2">📦</span> Continue with Amazon
         </button>
 
+        <button
+          type="button"
+          className="w-full bg-white border text-black py-2 rounded-full text-sm font-medium mb-3"
+        >
+          <span className="mr-2">🍎</span> Continue with Apple
+        </button>
+
+        <button
+          type="button"
+          className="w-full bg-white border text-black py-2 rounded-full text-sm font-medium mb-6"
+        >
+          <span className="mr-2">🟢</span> Continue with Google
+        </button>
+
+        <hr className="mb-6" />
+
+        <form onSubmit={handleSignup}>
+          <label className="block mb-1 text-sm font-medium">Your name</label>
+          <input
+            type="text"
+            placeholder="First and last name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full mb-4 px-4 py-2 border rounded-full text-sm"
+            required
+          />
+
+          <label className="block mb-1 text-sm font-medium">Email</label>
+          <input
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full mb-4 px-4 py-2 border rounded-full text-sm"
+            required
+          />
+
+          <label className="block mb-1 text-sm font-medium">Password</label>
+          <input
+            type="password"
+            autoComplete="new-password"
+            placeholder="At least 6 characters"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-4 py-2 border rounded-full text-sm"
+            required
+          />
+          <p className="text-xs text-gray-500 mt-1 mb-3">
+            ⓘ Passwords must be at least 6 characters.
+          </p>
+
+          <label className="block mb-1 text-sm font-medium">Re-enter password</label>
+          <input
+            type="password"
+            placeholder="Re-enter password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            className="w-full mb-4 px-4 py-2 border rounded-full text-sm"
+            required
+          />
+
+          {errorMsg && (
+            <p className="text-red-500 text-sm mb-4 text-center">{errorMsg}</p>
+          )}
+
+          <button
+            type="submit"
+            className="w-full bg-black text-white py-2 rounded-full text-sm hover:bg-gray-900 transition"
+          >
+            Create account
+          </button>
+        </form>
+
         <p className="text-xs text-gray-600 text-center mt-4">
-          By creating an account, you agree to the{" "}
-          <a href="#" className="underline">Terms of Service</a> and{" "}
+          By creating an account, you agree to the{' '}
+          <a href="#" className="underline">Terms of Service</a> and{' '}
           <a href="#" className="underline">Privacy Policy</a>.
         </p>
 
         <p className="text-sm text-center mt-6">
-          Already have an account?{" "}
+          Already have an account?{' '}
           <a href="/login" className="text-blue-600 underline hover:text-blue-800">
             Sign in
           </a>
         </p>
-      </form>
+      </div>
     </div>
   );
 }
