@@ -1,13 +1,13 @@
-// pages/dashboard.js
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../supabaseClient';
+import Modal from '../components/Modal';
 
 export default function Dashboard() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sessionEmail, setSessionEmail] = useState(null);
-  const [showWelcome, setShowWelcome] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -24,12 +24,6 @@ export default function Dashboard() {
       const userEmail = session.user.email;
       setSessionEmail(userEmail);
 
-      // Show welcome banner on first signup visit
-      if (router?.query?.newSignup === 'true') {
-        setShowWelcome(true);
-        setTimeout(() => setShowWelcome(false), 4000);
-      }
-
       const { data, error } = await supabase
         .from('rankings')
         .select('total_score, rank, percentile_rank')
@@ -42,20 +36,32 @@ export default function Dashboard() {
       }
 
       setLoading(false);
+
+      // Check localStorage to trigger the welcome modal
+      const hasSeenModal = localStorage.getItem('hasSeenWelcomeModal');
+      if (!hasSeenModal) {
+        setShowModal(true);
+        localStorage.setItem('hasSeenWelcomeModal', 'true');
+      }
     };
 
     getUserSession();
   }, []);
 
+  const handleStartSurvey = () => {
+    setShowModal(false);
+    router.push('/survey'); // 🔁 Change this to the real survey route when ready
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-6xl mx-auto">
-        {showWelcome && (
-          <div className="text-center text-white bg-green-500 py-3 px-4 rounded mb-6 text-lg font-semibold shadow">
-            👋 Welcome! You’re now signed up and logged in.
-          </div>
-        )}
+      <Modal show={showModal} onClose={handleCloseModal} onStartSurvey={handleStartSurvey} />
 
+      <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">Welcome, Austin!</h1>
 
         {loading ? (
