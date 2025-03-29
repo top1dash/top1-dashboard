@@ -17,7 +17,7 @@ export default function SurveySlugPage() {
 
     const fetchSurvey = async () => {
       const { data, error } = await supabase
-        .from('survey_config')
+        .from('survey.config')
         .select('config')
         .eq('survey_name', slug)
         .single();
