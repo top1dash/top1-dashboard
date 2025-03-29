@@ -1,15 +1,16 @@
 // pages/survey/[slug].js
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import { supabase } from '../../supabaseClient';
 
-export default function DynamicSurveyPage() {
+export default function SurveySlugPage() {
   const router = useRouter();
   const { slug } = router.query;
 
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState({});
   const [loading, setLoading] = useState(true);
+  const [surveyTitle, setSurveyTitle] = useState('');
 
   useEffect(() => {
     if (!slug) return;
@@ -22,12 +23,16 @@ export default function DynamicSurveyPage() {
         .single();
 
       if (error) {
-        console.error('Error loading survey config:', error);
+        console.error('Error fetching survey config:', error);
       } else {
-        const parsed = JSON.parse(data.config);
-        setQuestions(parsed.questions || []);
+        try {
+          const parsed = JSON.parse(data.config);
+          setQuestions(parsed.questions || []);
+          setSurveyTitle(parsed.title || slug);
+        } catch (err) {
+          console.error('Invalid JSON config:', err);
+        }
       }
-
       setLoading(false);
     };
 
@@ -40,22 +45,23 @@ export default function DynamicSurveyPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Submitting responses for:', slug);
-    console.log(responses);
-    // TODO: submit to Supabase
+    console.log('User responses:', responses);
+    // TODO: Save to Supabase if desired
     router.push('/dashboard');
   };
 
-  if (loading) return <p className="p-6 text-center">Loading survey...</p>;
+  if (loading) {
+    return <p className="p-6 text-center">Loading survey...</p>;
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
       <form
         onSubmit={handleSubmit}
-        className="bg-white max-w-3xl mx-auto rounded-xl shadow-md p-8 space-y-6"
+        className="bg-white w-full max-w-2xl rounded-xl shadow-md p-8 space-y-6"
       >
-        <h1 className="text-2xl font-bold text-center capitalize mb-6">
-          {slug.replace(/_/g, ' ')} Survey
+        <h1 className="text-2xl font-bold text-center mb-6">
+          {surveyTitle.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())} Survey
         </h1>
 
         {questions.map((q) => (
@@ -85,9 +91,7 @@ export default function DynamicSurveyPage() {
                     key={choice.value}
                     onClick={() => handleChange(q.id, choice.value)}
                     className={`cursor-pointer border rounded-lg p-2 hover:shadow ${
-                      responses[q.id] === choice.value
-                        ? 'ring-2 ring-blue-500'
-                        : ''
+                      responses[q.id] === choice.value ? 'ring-2 ring-blue-500' : ''
                     }`}
                   >
                     <img
