@@ -34,6 +34,10 @@ export default function Navbar() {
           Dashboard
         </Link>
 
+        <Link href="/surveys" className="text-gray-700 hover:text-blue-600">
+          Surveys
+        </Link>
+
         {!session && (
           <>
             <Link href="/login" className="text-gray-700 hover:text-blue-600">
@@ -45,7 +49,6 @@ export default function Navbar() {
           </>
         )}
 
-        {/* Shows user's email + logout when logged in */}
         <ProfileDropdown />
       </div>
     </nav>
