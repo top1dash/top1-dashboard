@@ -1,4 +1,3 @@
-// pages/signup.js
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../supabaseClient';
@@ -21,7 +20,13 @@ export default function Signup() {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    const { error } = await supabase.auth.signUp({ email, password });
+    setErrorMsg('');
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
     if (error) {
       setErrorMsg(error.message);
     } else {
@@ -30,41 +35,57 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form onSubmit={handleSignup} className="bg-white p-8 rounded shadow-md w-80">
-        <h2 className="text-xl font-bold mb-4">Sign Up</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div>
+        <form onSubmit={handleSignup} className="bg-white p-8 rounded-2xl shadow-md w-96">
+          <h2 className="text-2xl font-semibold text-center mb-6">Sign Up</h2>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full mb-4 px-4 py-2 border rounded"
-          required
-        />
+          {errorMsg && (
+            <p className="text-red-500 text-sm mb-4 text-center">{errorMsg}</p>
+          )}
 
-        <input
-          type="password"
-          name="password"
-          autoComplete="new-password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full mb-2 p-3 border rounded-md"
-          required
-        />
+          <input
+            type="email"
+            name="email"
+            autoComplete="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full mb-4 p-3 border rounded-md"
+            required
+          />
 
-        {errorMsg && (
-          <p className="text-red-500 text-sm mb-4">{errorMsg}</p>
-        )}
+          <input
+            type="password"
+            name="new-password"
+            autoComplete="new-password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full mb-4 p-3 border rounded-md"
+            required
+          />
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition"
-        >
-          Sign Up
-        </button>
-      </form>
+          <button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition"
+          >
+            Sign Up
+          </button>
+        </form>
+
+        <div className="mt-4 text-center">
+          <p className="text-sm text-gray-600">
+            Already have an account?{' '}
+            <a
+              href="/login"
+              className="text-blue-600 hover:text-blue-800 font-medium underline"
+            >
+              Click here to log in
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
