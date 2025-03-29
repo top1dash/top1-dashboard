@@ -1,92 +1,85 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { supabase } from '../supabaseClient';
+// pages/login.js
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
+import { supabase } from '../supabaseClient'
+import Link from 'next/link'
 
-export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
-  const router = useRouter();
+export default function LoginPage() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
+  const router = useRouter()
 
   useEffect(() => {
     const checkSession = async () => {
       const {
         data: { session },
-      } = await supabase.auth.getSession();
+      } = await supabase.auth.getSession()
       if (session) {
-        router.push('/dashboard');
+        router.push('/dashboard')
       }
-    };
-    checkSession();
-  }, []);
+    }
+    checkSession()
+  }, [])
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
+    e.preventDefault()
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
-      setErrorMsg(error.message);
+      setErrorMsg(error.message)
     } else {
-      router.push('/dashboard');
+      router.push('/dashboard')
     }
-  };
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div>
-        <form onSubmit={handleLogin} className="bg-white p-8 rounded-2xl shadow-md w-96">
-          <h2 className="text-2xl font-semibold text-center mb-6">Login</h2>
+      <form
+        onSubmit={handleLogin}
+        className="bg-white p-8 rounded-2xl shadow-md w-full max-w-md space-y-4"
+      >
+        <h2 className="text-2xl font-semibold text-center">Login</h2>
 
-          {errorMsg && (
-            <p className="text-red-500 text-sm mb-4 text-center">{errorMsg}</p>
-          )}
+        {errorMsg && (
+          <p className="text-red-500 text-sm text-center">{errorMsg}</p>
+        )}
 
-          <input
-            type="email"
-            name="email"
-            autoComplete="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full mb-4 p-3 border rounded-md"
-            required
-          />
+        <input
+          type="email"
+          name="email"
+          autoComplete="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full p-3 border rounded-md"
+          required
+        />
 
-          <input
-            type="password"
-            name="password"
-            autoComplete="current-password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full mb-4 p-3 border rounded-md"
-            required
-          />
+        <input
+          type="password"
+          name="password"
+          autoComplete="current-password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full p-3 border rounded-md"
+          required
+        />
 
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition"
-          >
-            Log In
-          </button>
-        </form>
+        <button
+          type="submit"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition"
+        >
+          Log In
+        </button>
 
-        <div className="mt-4 text-center">
-          <p className="text-sm text-gray-600">
-            New user?{' '}
-            <a
-              href="/signup"
-              className="text-blue-600 hover:text-blue-800 font-medium underline"
-            >
-              Click here to sign up
-            </a>
-          </p>
-        </div>
-      </div>
+        <p className="text-sm text-gray-600 text-center mt-4">
+          New user?{' '}
+          <Link href="/signup" className="text-blue-600 hover:text-blue-800 font-medium underline">
+            Click here to sign up
+          </Link>
+        </p>
+      </form>
     </div>
-  );
+  )
 }
