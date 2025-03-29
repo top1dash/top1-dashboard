@@ -33,7 +33,6 @@ export default function SurveySlugPage() {
             return;
           }
 
-          const parsed = JSON.parse(data.config);
           setQuestions(parsed.questions || []);
           setSurveyTitle(parsed.title || slug);
         } catch (err) {
