@@ -1,3 +1,4 @@
+// pages/login.js
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../supabaseClient';
@@ -52,7 +53,11 @@ export default function Login() {
             type="button"
             className="w-full flex items-center justify-center gap-2 border rounded py-2 hover:bg-gray-50"
           >
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" className="w-5 h-5" />
+            <img
+              src="https://www.svgrepo.com/show/475656/google-color.svg"
+              alt="Google"
+              className="w-5 h-5"
+            />
             Continue with Google
           </button>
         </div>
