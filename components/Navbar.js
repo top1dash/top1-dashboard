@@ -34,7 +34,7 @@ export default function Navbar() {
           Dashboard
         </Link>
 
-        <Link href="/surveys" className="text-gray-700 hover:text-blue-600">
+        <Link href="/survey" className="text-gray-700 hover:text-blue-600">
           Surveys
         </Link>
 
