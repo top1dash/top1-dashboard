@@ -1,4 +1,3 @@
-// pages/login.js
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../supabaseClient';
@@ -48,6 +47,8 @@ export default function Login() {
 
           <input
             type="email"
+            name="email"
+            autoComplete="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -57,6 +58,8 @@ export default function Login() {
 
           <input
             type="password"
+            name="password"
+            autoComplete="current-password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -67,23 +70,3 @@ export default function Login() {
           <button
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition"
-          >
-            Log In
-          </button>
-        </form>
-
-        <div className="mt-4 text-center">
-          <p className="text-sm text-gray-600">
-            New user?{' '}
-            <a
-              href="/signup"
-              className="text-blue-600 hover:text-blue-800 font-medium underline"
-            >
-              Click here to sign up
-            </a>
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
