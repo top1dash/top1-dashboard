@@ -48,26 +48,31 @@ export default function Signup() {
       <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
         <h2 className="text-2xl font-bold mb-6 text-center">Create Account</h2>
 
-        <button
-          type="button"
-          className="w-full bg-yellow-400 hover:bg-yellow-500 text-black py-2 rounded-full text-sm font-medium mb-3"
-        >
-          <span className="mr-2">📦</span> Continue with Amazon
-        </button>
+        <div className="space-y-3 mb-6">
+          <button
+            type="button"
+            className="w-full flex items-center justify-center gap-2 border rounded py-2 hover:bg-yellow-300 bg-yellow-400 font-medium"
+          >
+            <img src="https://upload.wikimedia.org/wikipedia/commons/d/de/Amazon_icon.png" alt="Amazon" className="w-5 h-5" />
+            Continue with Amazon
+          </button>
 
-        <button
-          type="button"
-          className="w-full bg-white border text-black py-2 rounded-full text-sm font-medium mb-3"
-        >
-          <span className="mr-2">🍎</span> Continue with Apple
-        </button>
+          <button
+            type="button"
+            className="w-full flex items-center justify-center gap-2 border rounded py-2 hover:bg-gray-100"
+          >
+            <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple" className="w-5 h-5" />
+            Continue with Apple
+          </button>
 
-        <button
-          type="button"
-          className="w-full bg-white border text-black py-2 rounded-full text-sm font-medium mb-6"
-        >
-          <span className="mr-2">🟢</span> Continue with Google
-        </button>
+          <button
+            type="button"
+            className="w-full flex items-center justify-center gap-2 border rounded py-2 hover:bg-gray-100"
+          >
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
+            Continue with Google
+          </button>
+        </div>
 
         <hr className="mb-6" />
 
