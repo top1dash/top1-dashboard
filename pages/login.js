@@ -1,5 +1,5 @@
 // pages/login.js
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../supabaseClient';
 
@@ -8,10 +8,6 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const router = useRouter();
-
-  const formRef = useRef(null);
-  const emailRef = useRef(null);
-  const passwordRef = useRef(null);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -23,22 +19,6 @@ export default function Login() {
       }
     };
     checkSession();
-  }, []);
-
-  // ✅ Auto-submit if browser autofills both fields (Chrome/Safari)
-  useEffect(() => {
-    const detectAutofill = setTimeout(() => {
-      const autoEmail = emailRef.current?.value || '';
-      const autoPassword = passwordRef.current?.value || '';
-      if (autoEmail && autoPassword) {
-        setEmail(autoEmail);
-        setPassword(autoPassword);
-        formRef.current?.dispatchEvent(
-          new Event('submit', { bubbles: true, cancelable: true })
-        );
-      }
-    }, 500);
-    return () => clearTimeout(detectAutofill);
   }, []);
 
   const handleLogin = async (e) => {
@@ -83,21 +63,14 @@ export default function Login() {
         </div>
 
         <div className="border-t pt-4 mb-6">
-          <form
-            ref={formRef}
-            onSubmit={handleLogin}
-            autoComplete="on"
-            method="post"
-            className="space-y-4 text-left"
-          >
+          <form onSubmit={handleLogin} autoComplete="on" method="post" className="space-y-4 text-left">
             <div>
               <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
               <input
-                ref={emailRef}
                 type="email"
                 name="email"
                 autoComplete="username"
-                defaultValue=""
+                value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 className="w-full px-4 py-2 border rounded"
@@ -108,11 +81,10 @@ export default function Login() {
             <div>
               <label htmlFor="password" className="block text-sm font-medium mb-1">Password</label>
               <input
-                ref={passwordRef}
                 type="password"
                 name="password"
                 autoComplete="current-password"
-                defaultValue=""
+                value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 className="w-full px-4 py-2 border rounded"
