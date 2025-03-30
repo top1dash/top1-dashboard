@@ -26,8 +26,6 @@ export default function SurveySlugPage() {
         console.error('Error fetching survey config:', error);
       } else {
         try {
-          console.log('Survey config pulled:', data.config);
-
           if (!data.config) {
             console.error('No config found in data:', data);
             return;
@@ -64,8 +62,8 @@ export default function SurveySlugPage() {
       const { error } = await supabase.from('responses').insert([
         {
           email: user.email,
-          answer_map: responses,     // 👈 This must match your column name
-          survey_name: slug,         // 👈 Add this column to your Supabase table if not present
+          answer_map: responses,
+          survey_name: slug,
         },
       ]);
 
@@ -98,26 +96,28 @@ export default function SurveySlugPage() {
 
         {questions.map((q) => (
           <div key={q.id}>
-            <label className="block text-lg font-medium mb-2">{q.text}</label>
+            <label className="block text-lg font-medium mb-4">{q.text}</label>
 
             {q.type === 'multiple_choice' && (
-              <select
-                value={responses[q.id] || ''}
-                onChange={(e) => handleChange(q.id, e.target.value)}
-                className="w-full border rounded px-4 py-2"
-                required
-              >
-                <option value="" disabled>Select one</option>
+              <div className="flex flex-wrap gap-2">
                 {q.options.map((option, index) => (
-                  <option key={index} value={option}>
+                  <button
+                    key={index}
+                    type="button"
+                    className={`px-4 py-2 rounded-full border text-sm transition 
+                      ${responses[q.id] === option
+                        ? 'bg-gray-300 border-gray-600 text-black font-medium'
+                        : 'bg-gray-100 border-gray-300 hover:bg-gray-200'}`}
+                    onClick={() => handleChange(q.id, option)}
+                  >
                     {option}
-                  </option>
+                  </button>
                 ))}
-              </select>
+              </div>
             )}
 
             {q.type === 'image_choice' && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
                 {q.options.map((choice, index) => (
                   <div
                     key={index}
