@@ -59,9 +59,15 @@ export default function SurveySlugPage() {
         return;
       }
 
+      // ✅ Pull name fields from user metadata
+      const firstName = user.user_metadata?.first_name || null;
+      const lastName = user.user_metadata?.last_name || null;
+
       const { error } = await supabase.from('responses').insert([
         {
           email: user.email,
+          name_first: firstName,
+          name_last: lastName,
           answer_map: responses,
           survey_name: slug,
         },
