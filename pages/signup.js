@@ -34,8 +34,8 @@ export default function Signup() {
       password,
       options: {
         data: {
-          name_first: firstName,
-          name_last: lastName,
+          first_name: firstName,
+          last_name: lastName,
         },
       },
     });
