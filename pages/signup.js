@@ -28,12 +28,19 @@ export default function Signup() {
       return;
     }
 
+    // Split full name into first and last
+    const [name_first, ...rest] = name.trim().split(' ');
+    const name_last = rest.join(' ') || '';
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: name }
-      }
+        data: {
+          name_first,
+          name_last,
+        },
+      },
     });
 
     if (error) {
