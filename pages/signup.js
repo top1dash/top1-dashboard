@@ -7,7 +7,8 @@ export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const router = useRouter();
 
@@ -28,17 +29,13 @@ export default function Signup() {
       return;
     }
 
-    // Split full name into first and last
-    const [name_first, ...rest] = name.trim().split(' ');
-    const name_last = rest.join(' ') || '';
-
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          name_first,
-          name_last,
+          name_first: firstName,
+          name_last: lastName,
         },
       },
     });
@@ -84,12 +81,22 @@ export default function Signup() {
         <hr className="mb-6" />
 
         <form onSubmit={handleSignup}>
-          <label className="block mb-1 text-sm font-medium">Your name</label>
+          <label className="block mb-1 text-sm font-medium">First name</label>
           <input
             type="text"
-            placeholder="First and last name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            placeholder="First name"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            className="w-full mb-4 px-4 py-2 border rounded-full text-sm"
+            required
+          />
+
+          <label className="block mb-1 text-sm font-medium">Last name</label>
+          <input
+            type="text"
+            placeholder="Last name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
             className="w-full mb-4 px-4 py-2 border rounded-full text-sm"
             required
           />
