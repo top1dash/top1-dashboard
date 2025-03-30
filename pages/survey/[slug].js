@@ -17,7 +17,7 @@ export default function SurveySlugPage() {
 
     const fetchSurvey = async () => {
       const { data, error } = await supabase
-        .from('survey_config') // ✅ correct table name with underscore
+        .from('survey_config')
         .select('config')
         .eq('survey_name', slug)
         .single();
@@ -26,7 +26,7 @@ export default function SurveySlugPage() {
         console.error('Error fetching survey config:', error);
       } else {
         try {
-          console.log('Survey config pulled:', data.config); // ✅ debug
+          console.log('Survey config pulled:', data.config);
 
           if (!data.config) {
             console.error('No config found in data:', data);
@@ -52,9 +52,34 @@ export default function SurveySlugPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('User responses:', responses);
-    // TODO: Save to Supabase if desired
-    router.push('/dashboard');
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user?.email) {
+        alert('You must be logged in to submit.');
+        return;
+      }
+
+      const { error } = await supabase.from('responses').insert([
+        {
+          email: user.email,
+          answer_map: responses,     // 👈 This must match your column name
+          survey_name: slug,         // 👈 Add this column to your Supabase table if not present
+        },
+      ]);
+
+      if (error) {
+        console.error('❌ Error saving response:', error);
+        alert('Something went wrong. Please try again.');
+      } else {
+        console.log('✅ Survey submitted successfully');
+        router.push('/dashboard');
+      }
+    } catch (err) {
+      console.error('❌ Unexpected error:', err);
+      alert('Unexpected error occurred.');
+    }
   };
 
   if (loading) {
