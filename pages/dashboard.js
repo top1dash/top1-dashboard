@@ -70,37 +70,44 @@ export default function Dashboard() {
         {loading ? (
           <p className="text-gray-500">Loading your data...</p>
         ) : userData ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-semibold text-gray-700">Chance of Divorce</h2>
-                <ShieldCheck className="w-5 h-5 text-blue-500" />
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold text-gray-700">Chance of Divorce</h2>
+                  <ShieldCheck className="w-5 h-5 text-blue-500" />
+                </div>
+                <p className="text-4xl font-bold text-blue-600">
+                  {(userData.total_score * 100).toFixed(0)}%
+                </p>
+                <p className="text-sm text-gray-500 mt-1">Based on your most recent survey</p>
               </div>
-              <p className="text-4xl font-bold text-blue-600">
-                {(userData.total_score * 100).toFixed(0)}%
-              </p>
-              <p className="text-sm text-gray-500 mt-1">Based on your most recent survey</p>
+
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold text-gray-700">Percentile Rank</h2>
+                  <BarChart2 className="w-5 h-5 text-green-500" />
+                </div>
+                <p className="text-4xl font-bold text-green-600">
+                  {(userData.percentile_rank * 100).toFixed(0)}%
+                </p>
+                <p className="text-sm text-gray-500 mt-1">Top {userData.rank} among users</p>
+              </div>
+
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold text-gray-700">Email Linked</h2>
+                  <Mail className="w-5 h-5 text-gray-400" />
+                </div>
+                <p className="text-md font-medium text-gray-800 break-words">{sessionEmail}</p>
+              </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-semibold text-gray-700">Percentile Rank</h2>
-                <BarChart2 className="w-5 h-5 text-green-500" />
-              </div>
-              <p className="text-4xl font-bold text-green-600">
-                {(userData.percentile_rank * 100).toFixed(0)}%
-              </p>
-              <p className="text-sm text-gray-500 mt-1">Top {userData.rank} among users</p>
+            {/* 🔥 New Filtered Rank Card (by age + gender) */}
+            <div className="mt-8">
+              <FilteredRankCard email={sessionEmail} />
             </div>
-
-            <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-semibold text-gray-700">Email Linked</h2>
-                <Mail className="w-5 h-5 text-gray-400" />
-              </div>
-              <p className="text-md font-medium text-gray-800 break-words">{sessionEmail}</p>
-            </div>
-          </div>
+          </>
         ) : (
           <p className="text-red-500 mt-4">No ranking data found for your email.</p>
         )}
