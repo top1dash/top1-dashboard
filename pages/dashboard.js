@@ -103,10 +103,12 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* 🔥 New Filtered Rank Card (by age + gender) */}
-            <div className="mt-8">
-              <FilteredRankCard email={sessionEmail} />
-            </div>
+            {/* ✅ Filtered Rank Card - Conditional */}
+            {sessionEmail && (
+              <div className="mt-8">
+                <FilteredRankCard user={{ email: sessionEmail }} />
+              </div>
+            )}
           </>
         ) : (
           <p className="text-red-500 mt-4">No ranking data found for your email.</p>
