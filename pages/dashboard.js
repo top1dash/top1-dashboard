@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../supabaseClient';
 import Modal from '../components/Modal';
-import FilteredRankCard from '@/components/FilteredRankCard';
+import FilteredRankCard from '../components/FilteredRankCard';
 import { ShieldCheck, BarChart2, Mail } from 'lucide-react';
 
 export default function Dashboard() {
