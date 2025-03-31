@@ -33,6 +33,10 @@ export default function Dashboard() {
         .order('updated_at', { ascending: false })
         .limit(1);
 
+      // ✅ Debug log to inspect what Supabase returned
+      console.log('💬 Supabase returned user data:', data);
+      console.log('🛑 Any Supabase error?', error);
+
       if (!error) {
         setUserData(data[0]);
       }
@@ -115,7 +119,6 @@ export default function Dashboard() {
                 />
               </div>
             )}
-
           </>
         ) : (
           <p className="text-red-500 mt-4">No ranking data found for your email.</p>
