@@ -13,6 +13,12 @@ export default function FilteredRankCard({ user }) {
   const fetchRank = async (genderFilter, ageFilter) => {
     setLoading(true);
     try {
+      console.log('📤 Fetching filtered rank with:', {
+        email: user?.email,
+        gender: genderFilter,
+        age: ageFilter,
+      });
+
       const response = await fetch('/functions/v1/get-filtered-rank', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -23,10 +29,12 @@ export default function FilteredRankCard({ user }) {
           age: ageFilter === 'default' ? null : ageFilter,
         }),
       });
+
       const data = await response.json();
+      console.log('✅ Received filtered rank data:', data);
       setRankData(data);
     } catch (error) {
-      console.error('Error fetching filtered rank:', error);
+      console.error('❌ Error fetching filtered rank:', error);
       setRankData(null);
     } finally {
       setLoading(false);
@@ -34,9 +42,20 @@ export default function FilteredRankCard({ user }) {
   };
 
   useEffect(() => {
-    if (!user?.email) return;
+    if (!user?.email) {
+      console.warn('⚠️ No user email provided to FilteredRankCard');
+      return;
+    }
+
     const defaultGender = user.gender || 'default';
     const defaultAge = user.age || 'default';
+
+    console.log('🎯 Initializing FilteredRankCard with:', {
+      email: user.email,
+      gender: defaultGender,
+      age: defaultAge,
+    });
+
     setGender(defaultGender);
     setAge(defaultAge);
     fetchRank(defaultGender, defaultAge);
