@@ -106,11 +106,15 @@ export default function Dashboard() {
             {/* ✅ Filtered Rank Card - Conditional */}
             {sessionEmail && (
               <div className="mt-8">
-                <FilteredRankCard user={{ 
-                  email: sessionEmail, 
-                  gender: userData?.gender || 'default', 
-                  age: userData?.age || 'default' 
-              }} />
+                <FilteredRankCard
+                  user={{
+                    email: sessionEmail,
+                    gender: userData?.gender || 'default',
+                    age: userData?.age || 'default',
+                  }}
+                />
+              </div>
+            )}
 
           </>
         ) : (
