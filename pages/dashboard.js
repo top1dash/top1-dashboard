@@ -19,6 +19,7 @@ export default function Dashboard() {
       } = await supabase.auth.getSession();
 
       if (!session || !session.user) {
+        console.warn('No valid user session found. Redirecting to login...');
         router.push('/login');
         return;
       }
@@ -33,12 +34,13 @@ export default function Dashboard() {
         .order('updated_at', { ascending: false })
         .limit(1);
 
-      // ✅ Debug log to inspect what Supabase returned
-      console.log('💬 Supabase returned user data:', data);
-      console.log('🛑 Any Supabase error?', error);
+      console.log('🔍 Supabase returned user data:', data);
+      console.log('❗ Any Supabase error?', error);
 
-      if (!error) {
+      if (!error && data && data.length > 0) {
         setUserData(data[0]);
+      } else {
+        console.warn('No user ranking data found or error occurred.');
       }
 
       setLoading(false);
@@ -107,18 +109,16 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* ✅ Filtered Rank Card - Conditional */}
-            {sessionEmail && (
-              <div className="mt-8">
-                <FilteredRankCard
-                  user={{
-                    email: sessionEmail,
-                    gender: userData?.gender || 'default',
-                    age: userData?.age || 'default',
-                  }}
-                />
-              </div>
-            )}
+            {/* ✅ Filtered Rank Card - now guarded with safe props */}
+            <div className="mt-8">
+              <FilteredRankCard
+                user={{
+                  email: sessionEmail,
+                  gender: userData?.gender || 'default',
+                  age: userData?.age || 'default',
+                }}
+              />
+            </div>
           </>
         ) : (
           <p className="text-red-500 mt-4">No ranking data found for your email.</p>
