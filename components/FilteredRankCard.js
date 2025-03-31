@@ -10,11 +10,20 @@ export default function FilteredRankCard({ user }) {
   const [rankData, setRankData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    console.log('🧪 FilteredRankCard mounted with user:', user);
+  }, [user]);
+
   const fetchRank = async (genderFilter, ageFilter) => {
+    if (!user?.email) {
+      console.warn('❌ No email provided to fetch rank');
+      return;
+    }
+
     setLoading(true);
     try {
-      console.log('📤 Fetching filtered rank with:', {
-        email: user?.email,
+      console.log('📡 Fetching filtered rank with:', {
+        email: user.email,
         gender: genderFilter,
         age: ageFilter,
       });
@@ -31,7 +40,7 @@ export default function FilteredRankCard({ user }) {
       });
 
       const data = await response.json();
-      console.log('✅ Received filtered rank data:', data);
+      console.log('✅ Fetched filtered rank data:', data);
       setRankData(data);
     } catch (error) {
       console.error('❌ Error fetching filtered rank:', error);
@@ -42,20 +51,9 @@ export default function FilteredRankCard({ user }) {
   };
 
   useEffect(() => {
-    if (!user?.email) {
-      console.warn('⚠️ No user email provided to FilteredRankCard');
-      return;
-    }
-
+    if (!user?.email) return;
     const defaultGender = user.gender || 'default';
     const defaultAge = user.age || 'default';
-
-    console.log('🎯 Initializing FilteredRankCard with:', {
-      email: user.email,
-      gender: defaultGender,
-      age: defaultAge,
-    });
-
     setGender(defaultGender);
     setAge(defaultAge);
     fetchRank(defaultGender, defaultAge);
@@ -66,6 +64,12 @@ export default function FilteredRankCard({ user }) {
       fetchRank(gender, age);
     }
   }, [gender, age]);
+
+  // 🚨 Prevent rendering if user.email is not present
+  if (!user?.email) {
+    console.warn('⚠️ Skipping FilteredRankCard render — missing user.email');
+    return null;
+  }
 
   return (
     <Card className="w-full max-w-xl mx-auto p-4 mt-6">
@@ -87,7 +91,7 @@ export default function FilteredRankCard({ user }) {
             <Label htmlFor="age">Age</Label>
             <Select value={age} onChange={setAge}>
               <SelectItem value="default">All</SelectItem>
-              {['18-20', '21-24', '25-29', '30-34', '35-39', '40-49', '50-59', '60+'].map(ageGroup => (
+              {['18-20', '21-24', '25-29', '30-34', '35-39', '40-49', '50-59', '60+'].map((ageGroup) => (
                 <SelectItem key={ageGroup} value={ageGroup}>
                   {ageGroup}
                 </SelectItem>
