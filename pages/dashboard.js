@@ -28,7 +28,7 @@ export default function Dashboard() {
 
       const { data, error } = await supabase
         .from('rankings')
-        .select('total_score, rank, percentile_rank')
+        .select('total_score, rank, percentile_rank, gender, age')
         .eq('email', userEmail)
         .order('updated_at', { ascending: false })
         .limit(1);
