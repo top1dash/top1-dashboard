@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Card, CardContent } from '../components/ui/card';
+import { Card } from '../components/ui/card';
+import { CardContent } from '../components/ui/cardContent';
 import { Label } from '../components/ui/label';
 import { Select } from '../components/ui/select';
 import { Skeleton } from '../components/ui/skeleton';
