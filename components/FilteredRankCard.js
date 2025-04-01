@@ -14,7 +14,7 @@ export default function FilteredRankCard({ user }) {
   const fetchRank = async (genderFilter, ageFilter) => {
     setLoading(true);
     try {
-      const response = await fetch('/functions/v1/get-filtered-rank', {
+      const response = await fetch('https://hwafvupabcnrialqqgxvy.supabase.co/functions/v1/get-filtered-rank', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
