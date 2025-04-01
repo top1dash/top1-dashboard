@@ -4,6 +4,7 @@ import { CardContent } from '../components/ui/cardContent';
 import { Label } from '../components/ui/label';
 import { Select } from '../components/ui/select';
 import { Skeleton } from '../components/ui/skeleton';
+import { supabase } from '../supabaseClient';
 
 export default function FilteredRankCard({ user }) {
   const [gender, setGender] = useState('default');
@@ -14,9 +15,16 @@ export default function FilteredRankCard({ user }) {
   const fetchRank = async (genderFilter, ageFilter) => {
     setLoading(true);
     try {
-      const response = await fetch('https://hwafvupabcnrialqqgxvy.supabase.co/functions/v1/get-filtered-rank', {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const response = await fetch('https://hwafvupabcnhialqqgxy.supabase.co/functions/v1/get-filtered-rank', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify({
           email: user.email,
           survey_name: 'divorce_risk',
@@ -24,8 +32,14 @@ export default function FilteredRankCard({ user }) {
           age: ageFilter === 'default' ? null : ageFilter,
         }),
       });
+
       const data = await response.json();
-      setRankData(data);
+      if (response.ok) {
+        setRankData(data);
+      } else {
+        console.error('❌ Supabase function error:', data?.error || 'Unknown');
+        setRankData(null);
+      }
     } catch (error) {
       console.error('❌ Error fetching filtered rank:', error);
       setRankData(null);
@@ -37,8 +51,10 @@ export default function FilteredRankCard({ user }) {
   useEffect(() => {
     if (!user?.email) return;
     console.log('📦 FilteredRankCard mounted with user:', user);
+
     const defaultGender = user.gender || 'default';
     const defaultAge = user.age || 'default';
+
     setGender(defaultGender);
     setAge(defaultAge);
     fetchRank(defaultGender, defaultAge);
@@ -57,7 +73,7 @@ export default function FilteredRankCard({ user }) {
 
         <div className="flex gap-4">
           {/* GENDER SELECT */}
-          <div className="flex flex-col">
+          <div className="flex flex-col flex-1">
             <Label htmlFor="gender">Gender</Label>
             <Select value={gender} onChange={setGender}>
               <option value="default">All</option>
@@ -68,39 +84,32 @@ export default function FilteredRankCard({ user }) {
           </div>
 
           {/* AGE SELECT */}
-          <div className="flex flex-col">
+          <div className="flex flex-col flex-1">
             <Label htmlFor="age">Age</Label>
             <Select value={age} onChange={setAge}>
               <option value="default">All</option>
-              {['18-20', '21-24', '25-29', '30-34', '35-39', '40-49', '50-59', '60+'].map(
-                (ageGroup) => (
-                  <option key={ageGroup} value={ageGroup}>
-                    {ageGroup}
-                  </option>
-                )
-              )}
+              {['18-20', '21-24', '25-29', '30-34', '35-39', '40-49', '50-59', '60+'].map((group) => (
+                <option key={group} value={group}>
+                  {group}
+                </option>
+              ))}
             </Select>
           </div>
         </div>
 
-        {/* RANK DATA DISPLAY */}
+        {/* RANK RESULTS */}
         <div className="mt-6">
           {loading || !rankData ? (
             <Skeleton className="h-8 w-full rounded-md" />
           ) : (
             <div className="text-lg">
               <p>
-                Rank:{' '}
-                <span className="font-bold">
-                  {rankData?.rank !== undefined ? `#${rankData.rank}` : 'N/A'}
-                </span>
+                Rank: <span className="font-bold">#{rankData.rank ?? 'N/A'}</span>
               </p>
               <p>
                 Percentile:{' '}
                 <span className="font-bold">
-                  {rankData?.percentile !== undefined
-                    ? `${(rankData.percentile * 100).toFixed(1)}%`
-                    : 'N/A'}
+                  {rankData.percentile !== undefined ? `${(rankData.percentile * 100).toFixed(1)}%` : 'N/A'}
                 </span>
               </p>
               <p className="text-sm text-muted-foreground mt-1">
