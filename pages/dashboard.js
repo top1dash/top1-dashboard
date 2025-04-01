@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { supabase } from '../supabaseClient';
 import Modal from '../components/Modal';
 import FilteredRankCard from '../components/FilteredRankCard';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 import { ShieldCheck, BarChart2, Mail } from 'lucide-react';
 
 export default function Dashboard() {
@@ -109,15 +110,17 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* ✅ Filtered Rank Card - passes safe props */}
+            {/* ✅ Filtered Rank Card - with ErrorBoundary wrapper */}
             <div className="mt-8">
-              <FilteredRankCard
-                user={{
-                  email: sessionEmail,
-                  gender: userData?.gender || 'default',
-                  age: userData?.age || 'default',
-                }}
-              />
+              <ErrorBoundary>
+                <FilteredRankCard
+                  user={{
+                    email: sessionEmail,
+                    gender: userData?.gender || 'default',
+                    age: userData?.age || 'default',
+                  }}
+                />
+              </ErrorBoundary>
             </div>
           </>
         ) : (
