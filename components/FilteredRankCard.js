@@ -23,7 +23,6 @@ export default function FilteredRankCard({ user }) {
           age: ageFilter === 'default' ? null : ageFilter,
         }),
       });
-
       const data = await response.json();
       setRankData(data);
     } catch (error) {
@@ -36,11 +35,9 @@ export default function FilteredRankCard({ user }) {
 
   useEffect(() => {
     if (!user?.email) return;
-    console.log('✅ TEST: FilteredRankCard loaded with user:', user);
-
+    console.log('📦 FilteredRankCard mounted with user:', user);
     const defaultGender = user.gender || 'default';
     const defaultAge = user.age || 'default';
-
     setGender(defaultGender);
     setAge(defaultAge);
     fetchRank(defaultGender, defaultAge);
@@ -58,52 +55,89 @@ export default function FilteredRankCard({ user }) {
         <h2 className="text-xl font-semibold">Your Divorce Risk Rank</h2>
 
         <div className="flex gap-4">
+          {/* GENDER SELECT */}
           <div className="flex flex-col">
             <Label htmlFor="gender">Gender</Label>
-            <Select value={gender} onChange={setGender}>
-              <SelectItem value="default">All</SelectItem>
-              <SelectItem value="Male">Male</SelectItem>
-              <SelectItem value="Female">Female</SelectItem>
-              <SelectItem value="I Consider Myself as Non-Binary">Non-Binary</SelectItem>
-            </Select>
+            {(() => {
+              try {
+                return (
+                  <Select value={gender} onChange={setGender}>
+                    <SelectItem value="default">All</SelectItem>
+                    <SelectItem value="Male">Male</SelectItem>
+                    <SelectItem value="Female">Female</SelectItem>
+                    <SelectItem value="I Consider Myself as Non-Binary">Non-Binary</SelectItem>
+                  </Select>
+                );
+              } catch (e) {
+                console.error('❌ Error rendering Gender Select:', e);
+                return <div className="text-red-500">Error rendering gender selector.</div>;
+              }
+            })()}
           </div>
 
+          {/* AGE SELECT */}
           <div className="flex flex-col">
             <Label htmlFor="age">Age</Label>
-            <Select value={age} onChange={setAge}>
-              <SelectItem value="default">All</SelectItem>
-              {['18-20', '21-24', '25-29', '30-34', '35-39', '40-49', '50-59', '60+'].map(ageGroup => (
-                <SelectItem key={ageGroup} value={ageGroup}>
-                  {ageGroup}
-                </SelectItem>
-              ))}
-            </Select>
+            {(() => {
+              try {
+                return (
+                  <Select value={age} onChange={setAge}>
+                    <SelectItem value="default">All</SelectItem>
+                    {['18-20', '21-24', '25-29', '30-34', '35-39', '40-49', '50-59', '60+'].map((ageGroup) => (
+                      <SelectItem key={ageGroup} value={ageGroup}>
+                        {ageGroup}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                );
+              } catch (e) {
+                console.error('❌ Error rendering Age Select:', e);
+                return <div className="text-red-500">Error rendering age selector.</div>;
+              }
+            })()}
           </div>
         </div>
 
+        {/* RANK DATA DISPLAY */}
         <div className="mt-6">
           {loading || !rankData ? (
-            <Skeleton className="h-8 w-full rounded-md" />
+            (() => {
+              try {
+                return <Skeleton className="h-8 w-full rounded-md" />;
+              } catch (e) {
+                console.error('❌ Error rendering Skeleton:', e);
+                return <div className="text-red-500">Error rendering loading state.</div>;
+              }
+            })()
           ) : (
-            <div className="text-lg">
-              <p>
-                Rank:{' '}
-                <span className="font-bold">
-                  {rankData?.rank !== undefined ? `#${rankData.rank}` : 'N/A'}
-                </span>
-              </p>
-              <p>
-                Percentile:{' '}
-                <span className="font-bold">
-                  {rankData?.percentile !== undefined
-                    ? `${(rankData.percentile * 100).toFixed(1)}%`
-                    : 'N/A'}
-                </span>
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Compared to others with your selected criteria
-              </p>
-            </div>
+            (() => {
+              try {
+                return (
+                  <div className="text-lg">
+                    <p>
+                      Rank:{' '}
+                      <span className="font-bold">
+                        {rankData?.rank !== undefined ? `#${rankData.rank}` : 'N/A'}
+                      </span>
+                    </p>
+                    <p>
+                      Percentile:{' '}
+                      <span className="font-bold">
+                        {rankData?.percentile !== undefined
+                          ? `${(rankData.percentile * 100).toFixed(1)}%`
+                          : 'N/A'}
+                      </span>
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Compared to others with your selected criteria
+                    </p>
+                  </div>
+                );
+              } catch (e) {
+                console.error('❌ Error rendering rank data:', e);
+                return <div className="text-red-500">Error rendering rank details.</div>;
+              }
+            })()
           )}
         </div>
       </CardContent>
