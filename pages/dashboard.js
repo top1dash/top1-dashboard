@@ -109,7 +109,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* ✅ Filtered Rank Card - now guarded with safe props */}
+            {/* ✅ Filtered Rank Card - passes safe props */}
             <div className="mt-8">
               <FilteredRankCard
                 user={{
