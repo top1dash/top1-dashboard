@@ -149,6 +149,27 @@ export default function Dashboard() {
                   </Link>
                 )}
               </div>
+
+              <div className="rounded-2xl shadow-sm p-6 border border-gray-200 bg-white">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold text-gray-700">Physical Percentile</h2>
+                  <BarChart2 className="w-5 h-5 text-indigo-500" />
+                </div>
+                {appearanceData ? (
+                  <>
+                    <p className="text-4xl font-bold text-green-600">
+                      {(appearanceData.percentile_rank * 100).toFixed(0)}%
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Top {appearanceData.rank} among users
+                    </p>
+                  </>
+                ) : (
+                  <Link href="/survey/physical_appearance_survey">
+                    <a className="text-blue-600 font-medium hover:underline">Take now!</a>
+                  </Link>
+                )}
+              </div>
             </div>
 
             <div className="mt-8">
