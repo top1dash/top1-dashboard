@@ -78,6 +78,9 @@ export default function Dashboard() {
     return aTaken - bTaken;
   });
 
+  const divorceData = getRankingBySurvey('divorce_risk');
+  const appearanceData = getRankingBySurvey('physical_appearance_survey');
+
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4">
       <Modal show={showModal} onClose={handleCloseModal} onStartSurvey={handleStartSurvey} />
@@ -92,38 +95,29 @@ export default function Dashboard() {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {sortedSurveys.map(({ slug, title }) => {
-                const ranking = getRankingBySurvey(slug);
-                return (
-                  <div
-                    key={slug}
-                    className={`rounded-2xl shadow-sm p-6 border border-gray-200 ${ranking ? 'bg-white' : 'bg-gray-50'}`}
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <h2 className="text-lg font-semibold text-gray-700">{title}</h2>
-                      {slug === 'divorce_risk' ? (
-                        <ShieldCheck className="w-5 h-5 text-blue-500" />
-                      ) : (
-                        <BarChart2 className="w-5 h-5 text-indigo-500" />
-                      )}
-                    </div>
-                    {ranking ? (
-                      <>
-                        <p className="text-4xl font-bold text-blue-600">
-                          {(ranking.total_score * 100).toFixed(0)}%
-                        </p>
-                        <p className="text-sm text-gray-500 mt-1">
-                          Top {(ranking.percentile_rank * 100).toFixed(0)}% of users
-                        </p>
-                      </>
-                    ) : (
-                      <Link href={`/survey/${slug}`}>
-                        <a className="text-blue-600 font-medium hover:underline">Take now!</a>
-                      </Link>
-                    )}
-                  </div>
-                );
-              })}
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold text-gray-700">Chance of Divorce</h2>
+                  <ShieldCheck className="w-5 h-5 text-blue-500" />
+                </div>
+                <p className="text-4xl font-bold text-blue-600">
+                  {(divorceData?.total_score * 100).toFixed(0)}%
+                </p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Top {(divorceData?.percentile_rank * 100).toFixed(0)}% of users
+                </p>
+              </div>
+
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold text-gray-700">Percentile Rank</h2>
+                  <BarChart2 className="w-5 h-5 text-green-500" />
+                </div>
+                <p className="text-4xl font-bold text-green-600">
+                  {(divorceData?.percentile_rank * 100).toFixed(0)}%
+                </p>
+                <p className="text-sm text-gray-500 mt-1">Top {divorceData?.rank} among users</p>
+              </div>
 
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
                 <div className="flex items-center justify-between mb-3">
@@ -131,6 +125,29 @@ export default function Dashboard() {
                   <Mail className="w-5 h-5 text-gray-400" />
                 </div>
                 <p className="text-md font-medium text-gray-800 break-words">{sessionEmail}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+              <div className="rounded-2xl shadow-sm p-6 border border-gray-200 bg-white">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold text-gray-700">Physical Appearance Score</h2>
+                  <BarChart2 className="w-5 h-5 text-indigo-500" />
+                </div>
+                {appearanceData ? (
+                  <>
+                    <p className="text-4xl font-bold text-blue-600">
+                      {(appearanceData.total_score * 100).toFixed(0)}%
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Top {(appearanceData.percentile_rank * 100).toFixed(0)}% of users
+                    </p>
+                  </>
+                ) : (
+                  <Link href="/survey/physical_appearance_survey">
+                    <a className="text-blue-600 font-medium hover:underline">Take now!</a>
+                  </Link>
+                )}
               </div>
             </div>
 
