@@ -44,6 +44,24 @@ function AddressAutocompleteInput({ questionId, onChange }) {
   );
 }
 
+function ToggleSwitch({ value, onChange }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!value)}
+      className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 ${
+        value ? 'bg-blue-500' : 'bg-gray-300'
+      }`}
+    >
+      <div
+        className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${
+          value ? 'translate-x-6' : 'translate-x-0'
+        }`}
+      />
+    </button>
+  );
+}
+
 export default function SurveySlugPage() {
   const router = useRouter();
   const { slug } = router.query;
@@ -181,6 +199,13 @@ export default function SurveySlugPage() {
                   </div>
                 ))}
               </div>
+            )}
+
+            {q.type === 'boolean' && (
+              <ToggleSwitch
+                value={!!responses[q.id]}
+                onChange={(val) => handleChange(q.id, val)}
+              />
             )}
 
             {q.type === 'address_autocomplete' && (
