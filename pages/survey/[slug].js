@@ -218,6 +218,13 @@ export default function SurveySlugPage() {
                 onChange={handleChange}
               />
             )}
+            {/* ✅ Add this new block below for college_autocomplete */}
+            {q.type === 'college_autocomplete' && (
+            <CollegeAutocompleteInput
+            questionId={q.id}
+            onChange={handleChange}
+      />
+    )}     
           </div>
         ))}
 
