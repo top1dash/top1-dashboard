@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { supabase } from "@/supabaseClient";
+import { supabase } from "../supabaseClient";
 import Fuse from "fuse.js";
 
 export default function CollegeAutocompleteInput({ questionId, onChange }) {
