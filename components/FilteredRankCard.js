@@ -23,6 +23,8 @@ export default function FilteredRankCard({ user, surveyName, onUpdate }) {
         age: activeFilter === 'age' ? user.age : null,
       };
 
+      console.log(`📡 Fetching filtered rank for:`, filters);
+
       const response = await fetch(
         'https://hwafvupabcnhialqqgxy.supabase.co/functions/v1/get-filtered-rank',
         {
@@ -36,13 +38,17 @@ export default function FilteredRankCard({ user, surveyName, onUpdate }) {
       );
 
       const data = await response.json();
+
       if (response.ok) {
-        onUpdate?.(data); // 🔥 Push result to parent (Dashboard)
+        console.log(`✅ Filtered result from Supabase:`, data);
+        onUpdate?.(activeFilter === 'all' ? null : data); // Pass null to reset
       } else {
         console.error('❌ Supabase function error:', data?.error || 'Unknown');
+        onUpdate?.(null);
       }
     } catch (error) {
       console.error('❌ Fetch error:', error);
+      onUpdate?.(null);
     }
     setLoading(false);
   };
