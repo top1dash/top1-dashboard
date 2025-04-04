@@ -50,7 +50,7 @@ function ToggleSwitch({ value, onChange }) {
       type="button"
       onClick={() => onChange(!value)}
       className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 ${
-        value ? 'bg-blue-500' : 'bg-gray-300'
+        value ? 'bg-gray-300' : 'bg-gray-200'
       }`}
     >
       <div
