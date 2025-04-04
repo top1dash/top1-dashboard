@@ -102,12 +102,20 @@ export default function Dashboard() {
                   <h2 className="text-lg font-semibold text-gray-700">Chance of Divorce</h2>
                   <ShieldCheck className="w-5 h-5 text-blue-500" />
                 </div>
-                <p className="text-4xl font-bold text-blue-600">
-                  {(divorceData?.total_score * 100).toFixed(0)}%
-                </p>
-                <p className="text-sm text-gray-500 mt-1">
-                  Top {(filteredDivorce?.percentile_rank * 100 || divorceData?.percentile_rank * 100).toFixed(0)}% of users
-                </p>
+                {divorceData ? (
+                  <>
+                    <p className="text-4xl font-bold text-blue-600">
+                      {(divorceData?.total_score * 100).toFixed(0)}%
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Top {(filteredDivorce?.percentile_rank * 100 || divorceData?.percentile_rank * 100).toFixed(0)}% of users
+                    </p>
+                  </>
+                ) : (
+                  <Link href="/survey/divorce_risk">
+                    <a className="text-blue-600 font-medium hover:underline">Take now!</a>
+                  </Link>
+                )}
               </div>
 
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
@@ -115,22 +123,30 @@ export default function Dashboard() {
                   <h2 className="text-lg font-semibold text-gray-700">Percentile Rank</h2>
                   <BarChart2 className="w-5 h-5 text-green-500" />
                 </div>
-                <p className="text-4xl font-bold text-green-600">
-                  {(filteredDivorce?.percentile_rank * 100 || divorceData?.percentile_rank * 100).toFixed(0)}%
-                </p>
-                <p className="text-sm text-gray-500 mt-1">
-                  Top {filteredDivorce?.rank || divorceData?.rank} among users
-                </p>
+                {divorceData ? (
+                  <>
+                    <p className="text-4xl font-bold text-green-600">
+                      {(filteredDivorce?.percentile_rank * 100 || divorceData?.percentile_rank * 100).toFixed(0)}%
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Top {filteredDivorce?.rank || divorceData?.rank} among users
+                    </p>
 
-                <FilteredRankCard
-                  user={{
-                    email: sessionEmail,
-                    gender: userRankings[0]?.gender || 'default',
-                    age: userRankings[0]?.age || 'default',
-                  }}
-                  surveyName="divorce_risk"
-                  onUpdate={setFilteredDivorce}
-                />
+                    <FilteredRankCard
+                      user={{
+                        email: sessionEmail,
+                        gender: userRankings[0]?.gender || 'default',
+                        age: userRankings[0]?.age || 'default',
+                      }}
+                      surveyName="divorce_risk"
+                      onUpdate={setFilteredDivorce}
+                    />
+                  </>
+                ) : (
+                  <Link href="/survey/divorce_risk">
+                    <a className="text-blue-600 font-medium hover:underline">Take now!</a>
+                  </Link>
+                )}
               </div>
 
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
