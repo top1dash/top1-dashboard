@@ -5,7 +5,7 @@ import FilterChips from './FilterChips';
 
 const FILTER_OPTIONS = ['all', 'gender', 'age'];
 
-export default function FilteredRankCard({ user, surveyName }) {
+export default function FilteredRankCard({ user, surveyName, onUpdate }) {
   const [activeFilter, setActiveFilter] = useState('all');
   const [rankData, setRankData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -36,15 +36,18 @@ export default function FilteredRankCard({ user, surveyName }) {
       });
 
       const data = await response.json();
-      if (response.ok) {
+      if (response.ok && data) {
         setRankData(data);
+        onUpdate?.(data);
       } else {
         console.error(`❌ [${surveyName}] Supabase function error:`, data?.error || 'Unknown');
         setRankData(null);
+        onUpdate?.(null);
       }
     } catch (error) {
       console.error(`❌ [${surveyName}] Fetch error:`, error);
       setRankData(null);
+      onUpdate?.(null);
     }
     setLoading(false);
   };
