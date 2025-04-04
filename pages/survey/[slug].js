@@ -1,7 +1,48 @@
 // pages/survey/[slug].js
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../../supabaseClient';
+
+function AddressAutocompleteInput({ questionId, onChange }) {
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (window.google && inputRef.current) {
+      const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
+        types: ['geocode'],
+      });
+
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        const components = {};
+
+        place.address_components.forEach(comp => {
+          comp.types.forEach(type => {
+            components[type] = comp.long_name;
+          });
+        });
+
+        const value = {
+          formatted_address: place.formatted_address,
+          city: components.locality || '',
+          state: components.administrative_area_level_1 || '',
+          zip: components.postal_code || '',
+        };
+
+        onChange(questionId, value);
+      });
+    }
+  }, []);
+
+  return (
+    <input
+      ref={inputRef}
+      type="text"
+      placeholder="Start typing your address..."
+      className="border p-2 rounded w-full"
+    />
+  );
+}
 
 export default function SurveySlugPage() {
   const router = useRouter();
@@ -59,7 +100,6 @@ export default function SurveySlugPage() {
         return;
       }
 
-      // ✅ Pull name fields from user metadata
       const firstName = user.user_metadata?.first_name || null;
       const lastName = user.user_metadata?.last_name || null;
 
@@ -141,6 +181,13 @@ export default function SurveySlugPage() {
                   </div>
                 ))}
               </div>
+            )}
+
+            {q.type === 'address_autocomplete' && (
+              <AddressAutocompleteInput
+                questionId={q.id}
+                onChange={handleChange}
+              />
             )}
           </div>
         ))}
