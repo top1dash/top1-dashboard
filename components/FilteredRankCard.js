@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
-import { Card } from '../components/ui/card';
-import { CardContent } from '../components/ui/cardContent';
-import { Skeleton } from '../components/ui/skeleton';
+import React, { useState, useEffect } from 'react';
+import { Card } from './ui/card';
+import { CardContent } from './ui/cardContent';
+import { Skeleton } from './ui/skeleton';
 import { supabase } from '../supabaseClient';
+import FilterChips from './FilterChips';
 
-const FILTER_OPTIONS = ['all', 'gender', 'age']; // You can expand this later with 'zip', 'city', 'school'
+const FILTER_OPTIONS = ['all', 'gender', 'age'];
 
 export default function FilteredRankCard({ user }) {
   const [activeFilter, setActiveFilter] = useState('all');
@@ -72,21 +73,7 @@ export default function FilteredRankCard({ user }) {
         )}
 
         {/* Filter Chips */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          {FILTER_OPTIONS.map(option => (
-            <button
-              key={option}
-              onClick={() => setActiveFilter(option)}
-              className={`px-3 py-1 rounded-full border text-sm transition ${
-                activeFilter === option
-                  ? 'bg-indigo-600 text-white border-indigo-600'
-                  : 'bg-white text-gray-700 border-gray-300'
-              }`}
-            >
-              {option === 'all' ? 'All Users' : `Your ${option.charAt(0).toUpperCase() + option.slice(1)}`}
-            </button>
-          ))}
-        </div>
+        <FilterChips activeFilter={activeFilter} onFilterChange={setActiveFilter} />
       </CardContent>
     </Card>
   );
