@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Card } from './ui/card';
-import { CardContent } from './ui/cardContent';
 import { Skeleton } from './ui/skeleton';
 import { supabase } from '../supabaseClient';
 import FilterChips from './FilterChips';
 
 const FILTER_OPTIONS = ['all', 'gender', 'age'];
 
-export default function FilteredRankCard({ user }) {
+export default function FilteredRankCard({ user, surveyName }) {
   const [activeFilter, setActiveFilter] = useState('all');
   const [rankData, setRankData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -21,12 +19,12 @@ export default function FilteredRankCard({ user }) {
 
       const filters = {
         email: user.email,
-        survey_name: 'divorce_risk',
+        survey_name: surveyName,
         gender: activeFilter === 'gender' ? user.gender : null,
         age: activeFilter === 'age' ? user.age : null,
       };
 
-      console.log('📦 Sending filters to Supabase function:', filters);
+      console.log(`📦 [${surveyName}] Sending filters to Supabase function:`, filters);
 
       const response = await fetch('https://hwafvupabcnhialqqgxy.supabase.co/functions/v1/get-filtered-rank', {
         method: 'POST',
@@ -41,11 +39,11 @@ export default function FilteredRankCard({ user }) {
       if (response.ok) {
         setRankData(data);
       } else {
-        console.error('❌ Supabase function error:', data?.error || 'Unknown');
+        console.error(`❌ [${surveyName}] Supabase function error:`, data?.error || 'Unknown');
         setRankData(null);
       }
     } catch (error) {
-      console.error('❌ Fetch error:', error);
+      console.error(`❌ [${surveyName}] Fetch error:`, error);
       setRankData(null);
     }
     setLoading(false);
@@ -53,26 +51,26 @@ export default function FilteredRankCard({ user }) {
 
   useEffect(() => {
     fetchRank();
-  }, [activeFilter]);
+  }, [activeFilter, surveyName]);
 
   return (
-    <div className="mt-4">
-      {/* Score Display */}
+    <div className="mt-2 text-center">
       {loading ? (
-        <Skeleton className="h-10 w-24 mb-2" />
+        <Skeleton className="h-10 w-24 mb-2 mx-auto" />
       ) : rankData ? (
         <>
-          <p className="text-3xl font-bold">{rankData.total_score.toFixed(2)}</p>
-          <p className="text-sm text-muted-foreground">
-            Rank #{rankData.rank} &bull; Top {(rankData.percentile_rank * 100).toFixed(1)}%
+          <p className="text-4xl font-bold text-green-600">
+            {(rankData.percentile_rank * 100).toFixed(0)}%
+          </p>
+          <p className="text-sm text-gray-500 mt-1">
+            Top {rankData.rank} among users
           </p>
         </>
       ) : (
         <p className="text-red-500">Unable to load rank data.</p>
       )}
 
-      {/* Filter Chips Inline */}
-      <div className="mt-2">
+      <div className="mt-2 flex justify-center">
         <FilterChips activeFilter={activeFilter} onFilterChange={setActiveFilter} />
       </div>
     </div>
