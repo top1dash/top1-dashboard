@@ -26,6 +26,8 @@ export default function FilteredRankCard({ user }) {
         age: activeFilter === 'age' ? user.age : null,
       };
 
+      console.log('📦 Sending filters to Supabase function:', filters);
+
       const response = await fetch('https://hwafvupabcnhialqqgxy.supabase.co/functions/v1/get-filtered-rank', {
         method: 'POST',
         headers: {
@@ -54,27 +56,25 @@ export default function FilteredRankCard({ user }) {
   }, [activeFilter]);
 
   return (
-    <Card>
-      <CardContent className="p-4">
-        <h2 className="text-lg font-semibold mb-2">Your Divorce Risk Rank</h2>
+    <div className="mt-4">
+      {/* Score Display */}
+      {loading ? (
+        <Skeleton className="h-10 w-24 mb-2" />
+      ) : rankData ? (
+        <>
+          <p className="text-3xl font-bold">{rankData.total_score.toFixed(2)}</p>
+          <p className="text-sm text-muted-foreground">
+            Rank #{rankData.rank} &bull; Top {(rankData.percentile_rank * 100).toFixed(1)}%
+          </p>
+        </>
+      ) : (
+        <p className="text-red-500">Unable to load rank data.</p>
+      )}
 
-        {/* Score Display */}
-        {loading ? (
-          <Skeleton className="h-10 w-24 mb-2" />
-        ) : rankData ? (
-          <>
-            <p className="text-3xl font-bold">{rankData.total_score.toFixed(2)}</p>
-            <p className="text-sm text-muted-foreground">
-              Rank #{rankData.rank} &bull; Top {(rankData.percentile_rank * 100).toFixed(1)}%
-            </p>
-          </>
-        ) : (
-          <p className="text-red-500">Unable to load rank data.</p>
-        )}
-
-        {/* Filter Chips */}
+      {/* Filter Chips Inline */}
+      <div className="mt-2">
         <FilterChips activeFilter={activeFilter} onFilterChange={setActiveFilter} />
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
