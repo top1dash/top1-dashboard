@@ -16,7 +16,8 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "@supabase/supabase-js": "^2.39.5",
-    "lucide-react": "^0.292.0"
+    "lucide-react": "^0.292.0",
+    "fuse.js": "^6.6.2"
 
   }
 }
