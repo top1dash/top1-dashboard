@@ -45,17 +45,19 @@ function AddressAutocompleteInput({ questionId, onChange }) {
 }
 
 function ToggleSwitch({ value, onChange }) {
+  const isOn = value === true;
+
   return (
     <button
       type="button"
       onClick={() => onChange(!value)}
       className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 ${
-        value ? 'bg-gray-300' : 'bg-gray-200'
+        isOn ? 'bg-gray-300 border border-gray-600' : 'bg-gray-200'
       }`}
     >
       <div
         className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${
-          value ? 'translate-x-6' : 'translate-x-0'
+          isOn ? 'translate-x-6' : 'translate-x-0'
         }`}
       />
     </button>
