@@ -173,6 +173,16 @@ export default function Dashboard() {
                     <p className="text-sm text-gray-500 mt-1">
                       Top {appearanceData.rank} among users
                     </p>
+                
+                    {/* 👇 Add FilteredRankCard under percentile */}
+                    <FilteredRankCard
+                      user={{
+                        email: sessionEmail,
+                        gender: userRankings[0]?.gender || 'default',
+                        age: userRankings[0]?.age || 'default',
+                      }}
+                      surveyName="physical_appearance_survey"
+                    />
                   </>
                 ) : (
                   <Link href="/survey/physical_appearance_survey">
