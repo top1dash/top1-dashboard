@@ -137,7 +137,7 @@ export default function Dashboard() {
                 {appearanceData ? (
                   <>
                     <p className="text-4xl font-bold text-blue-600">
-                      (appearanceData.total_score)
+                         {(appearanceData.total_score)}
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
                       Top {(appearanceData.percentile_rank * 100).toFixed(0)}% of users
