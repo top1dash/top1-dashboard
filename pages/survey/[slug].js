@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../../supabaseClient';
-import CollegeAutocompleteInput from "../components/ui/CollegeAutocompleteInput";
+import CollegeAutocompleteInput from "../../components/ui/CollegeAutocompleteInput";
 
 
 function AddressAutocompleteInput({ questionId, onChange }) {
