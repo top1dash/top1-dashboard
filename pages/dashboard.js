@@ -191,18 +191,6 @@ export default function Dashboard() {
                 )}
               </div>
             </div>
-
-            <div className="mt-8">
-              <ErrorBoundary>
-                <FilteredRankCard
-                  user={{
-                    email: sessionEmail,
-                    gender: userRankings[0]?.gender || 'default',
-                    age: userRankings[0]?.age || 'default',
-                  }}
-                />
-              </ErrorBoundary>
-            </div>
           </>
         )}
 
