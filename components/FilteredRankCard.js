@@ -1,23 +1,29 @@
 import { useEffect, useState } from 'react';
 import { Card } from '../components/ui/card';
 import { CardContent } from '../components/ui/cardContent';
-import { Label } from '../components/ui/label';
-import { Select } from '../components/ui/select';
 import { Skeleton } from '../components/ui/skeleton';
 import { supabase } from '../supabaseClient';
 
+const FILTER_OPTIONS = ['all', 'gender', 'age']; // You can expand this later with 'zip', 'city', 'school'
+
 export default function FilteredRankCard({ user }) {
-  const [gender, setGender] = useState('default');
-  const [age, setAge] = useState('default');
+  const [activeFilter, setActiveFilter] = useState('all');
   const [rankData, setRankData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchRank = async (genderFilter, ageFilter) => {
+  const fetchRank = async () => {
     setLoading(true);
     try {
       const {
         data: { session },
       } = await supabase.auth.getSession();
+
+      const filters = {
+        email: user.email,
+        survey_name: 'divorce_risk',
+        gender: activeFilter === 'gender' ? user.gender : null,
+        age: activeFilter === 'age' ? user.age : null,
+      };
 
       const response = await fetch('https://hwafvupabcnhialqqgxy.supabase.co/functions/v1/get-filtered-rank', {
         method: 'POST',
@@ -25,12 +31,7 @@ export default function FilteredRankCard({ user }) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({
-          email: user.email,
-          survey_name: 'divorce_risk',
-          gender: genderFilter === 'default' ? null : genderFilter,
-          age: ageFilter === 'default' ? null : ageFilter,
-        }),
+        body: JSON.stringify(filters),
       });
 
       const data = await response.json();
@@ -41,82 +42,50 @@ export default function FilteredRankCard({ user }) {
         setRankData(null);
       }
     } catch (error) {
-      console.error('❌ Error fetching filtered rank:', error);
+      console.error('❌ Fetch error:', error);
       setRankData(null);
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
-    if (!user?.email) return;
-    console.log('📦 FilteredRankCard mounted with user:', user);
-
-    const defaultGender = user.gender || 'default';
-    const defaultAge = user.age || 'default';
-
-    setGender(defaultGender);
-    setAge(defaultAge);
-    fetchRank(defaultGender, defaultAge);
-  }, [user]);
-
-  useEffect(() => {
-    if (user?.email) {
-      fetchRank(gender, age);
-    }
-  }, [gender, age]);
+    fetchRank();
+  }, [activeFilter]);
 
   return (
-    <Card className="w-full max-w-xl mx-auto p-4 mt-6">
-      <CardContent className="space-y-4">
-        <h2 className="text-xl font-semibold">Your Divorce Risk Rank</h2>
+    <Card>
+      <CardContent className="p-4">
+        <h2 className="text-lg font-semibold mb-2">Your Divorce Risk Rank</h2>
 
-        <div className="flex gap-4">
-          {/* GENDER SELECT */}
-          <div className="flex flex-col flex-1">
-            <Label htmlFor="gender">Gender</Label>
-            <Select value={gender} onChange={setGender}>
-              <option value="default">All</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="I Consider Myself as Non-Binary">Non-Binary</option>
-            </Select>
-          </div>
+        {/* Score Display */}
+        {loading ? (
+          <Skeleton className="h-10 w-24 mb-2" />
+        ) : rankData ? (
+          <>
+            <p className="text-3xl font-bold">{rankData.total_score.toFixed(2)}</p>
+            <p className="text-sm text-muted-foreground">
+              Rank #{rankData.rank} &bull; Top {(rankData.percentile_rank * 100).toFixed(1)}%
+            </p>
+          </>
+        ) : (
+          <p className="text-red-500">Unable to load rank data.</p>
+        )}
 
-          {/* AGE SELECT */}
-          <div className="flex flex-col flex-1">
-            <Label htmlFor="age">Age</Label>
-            <Select value={age} onChange={setAge}>
-              <option value="default">All</option>
-              {['18-20', '21-24', '25-29', '30-34', '35-39', '40-49', '50-59', '60+'].map((group) => (
-                <option key={group} value={group}>
-                  {group}
-                </option>
-              ))}
-            </Select>
-          </div>
-        </div>
-
-        {/* RANK RESULTS */}
-        <div className="mt-6">
-          {loading || !rankData ? (
-            <Skeleton className="h-8 w-full rounded-md" />
-          ) : (
-            <div className="text-lg">
-              <p>
-                Rank: <span className="font-bold">#{rankData.rank ?? 'N/A'}</span>
-              </p>
-              <p>
-                Percentile:{' '}
-                <span className="font-bold">
-                  {rankData.percentile !== undefined ? `${(rankData.percentile * 100).toFixed(1)}%` : 'N/A'}
-                </span>
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Compared to others with your selected criteria
-              </p>
-            </div>
-          )}
+        {/* Filter Chips */}
+        <div className="mt-4 flex flex-wrap gap-2">
+          {FILTER_OPTIONS.map(option => (
+            <button
+              key={option}
+              onClick={() => setActiveFilter(option)}
+              className={`px-3 py-1 rounded-full border text-sm transition ${
+                activeFilter === option
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'bg-white text-gray-700 border-gray-300'
+              }`}
+            >
+              {option === 'all' ? 'All Users' : `Your ${option.charAt(0).toUpperCase() + option.slice(1)}`}
+            </button>
+          ))}
         </div>
       </CardContent>
     </Card>
