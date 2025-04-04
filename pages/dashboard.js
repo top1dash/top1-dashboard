@@ -17,6 +17,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [sessionEmail, setSessionEmail] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [filteredDivorce, setFilteredDivorce] = useState(null);
+  const [filteredAppearance, setFilteredAppearance] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -104,7 +106,7 @@ export default function Dashboard() {
                   {(divorceData?.total_score * 100).toFixed(0)}%
                 </p>
                 <p className="text-sm text-gray-500 mt-1">
-                  Top {(divorceData?.percentile_rank * 100).toFixed(0)}% of users
+                  Top {(filteredDivorce?.percentile_rank * 100 || divorceData?.percentile_rank * 100).toFixed(0)}% of users
                 </p>
               </div>
 
@@ -114,20 +116,22 @@ export default function Dashboard() {
                   <BarChart2 className="w-5 h-5 text-green-500" />
                 </div>
                 <p className="text-4xl font-bold text-green-600">
-                  {(divorceData?.percentile_rank * 100).toFixed(0)}%
+                  {(filteredDivorce?.percentile_rank * 100 || divorceData?.percentile_rank * 100).toFixed(0)}%
                 </p>
-                <p className="text-sm text-gray-500 mt-1">Top {divorceData?.rank} among users</p>
-              
-                {/* ✅ Add FilteredRankCard for Divorce just below */}
-                  <FilteredRankCard
-                    user={{
-                      email: sessionEmail,
-                      gender: userRankings[0]?.gender || 'default',
-                      age: userRankings[0]?.age || 'default',
-                    }}
-                    surveyName="divorce_risk"
-                  />
-                </div>
+                <p className="text-sm text-gray-500 mt-1">
+                  Top {filteredDivorce?.rank || divorceData?.rank} among users
+                </p>
+
+                <FilteredRankCard
+                  user={{
+                    email: sessionEmail,
+                    gender: userRankings[0]?.gender || 'default',
+                    age: userRankings[0]?.age || 'default',
+                  }}
+                  surveyName="divorce_risk"
+                  onUpdate={setFilteredDivorce}
+                />
+              </div>
 
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
                 <div className="flex items-center justify-between mb-3">
@@ -147,10 +151,10 @@ export default function Dashboard() {
                 {appearanceData ? (
                   <>
                     <p className="text-4xl font-bold text-blue-600">
-                         {(appearanceData.total_score)}
+                      {appearanceData.total_score}
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      Top {(appearanceData.percentile_rank * 100).toFixed(0)}% of users
+                      Top {(filteredAppearance?.percentile_rank * 100 || appearanceData?.percentile_rank * 100).toFixed(0)}% of users
                     </p>
                   </>
                 ) : (
@@ -168,13 +172,12 @@ export default function Dashboard() {
                 {appearanceData ? (
                   <>
                     <p className="text-4xl font-bold text-green-600">
-                      {(appearanceData.percentile_rank * 100).toFixed(0)}%
+                      {(filteredAppearance?.percentile_rank * 100 || appearanceData?.percentile_rank * 100).toFixed(0)}%
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      Top {appearanceData.rank} among users
+                      Top {filteredAppearance?.rank || appearanceData?.rank} among users
                     </p>
-                
-                    {/* 👇 Add FilteredRankCard under percentile */}
+
                     <FilteredRankCard
                       user={{
                         email: sessionEmail,
@@ -182,6 +185,7 @@ export default function Dashboard() {
                         age: userRankings[0]?.age || 'default',
                       }}
                       surveyName="physical_appearance_survey"
+                      onUpdate={setFilteredAppearance}
                     />
                   </>
                 ) : (
