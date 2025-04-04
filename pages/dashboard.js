@@ -117,7 +117,17 @@ export default function Dashboard() {
                   {(divorceData?.percentile_rank * 100).toFixed(0)}%
                 </p>
                 <p className="text-sm text-gray-500 mt-1">Top {divorceData?.rank} among users</p>
-              </div>
+              
+                {/* ✅ Add FilteredRankCard for Divorce just below */}
+                  <FilteredRankCard
+                    user={{
+                      email: sessionEmail,
+                      gender: userRankings[0]?.gender || 'default',
+                      age: userRankings[0]?.age || 'default',
+                    }}
+                    surveyName="divorce_risk"
+                  />
+                </div>
 
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
                 <div className="flex items-center justify-between mb-3">
