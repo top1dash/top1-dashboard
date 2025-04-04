@@ -3,14 +3,8 @@ import { useRouter } from 'next/router';
 import { supabase } from '../supabaseClient';
 import Modal from '../components/Modal';
 import FilteredRankCard from '../components/FilteredRankCard';
-import { ErrorBoundary } from '../components/ErrorBoundary';
 import { ShieldCheck, BarChart2, Mail } from 'lucide-react';
 import Link from 'next/link';
-
-const SURVEYS = [
-  { slug: 'divorce_risk', title: 'Chance of Divorce' },
-  { slug: 'physical_appearance_survey', title: 'Physical Appearance Score' },
-];
 
 export default function Dashboard() {
   const [userRankings, setUserRankings] = useState([]);
@@ -28,7 +22,6 @@ export default function Dashboard() {
       } = await supabase.auth.getSession();
 
       if (!session || !session.user) {
-        console.warn('No valid user session found. Redirecting to login...');
         router.push('/login');
         return;
       }
@@ -41,13 +34,8 @@ export default function Dashboard() {
         .select('*')
         .eq('email', userEmail);
 
-      console.log('🔍 Supabase returned user rankings:', data);
-      console.log('❗ Any Supabase error?', error);
-
       if (!error && data) {
         setUserRankings(data);
-      } else {
-        console.warn('No user ranking data found or error occurred.');
       }
 
       setLoading(false);
@@ -74,12 +62,6 @@ export default function Dashboard() {
   const getRankingBySurvey = (slug) =>
     userRankings.find((r) => r.survey_name === slug);
 
-  const sortedSurveys = [...SURVEYS].sort((a, b) => {
-    const aTaken = getRankingBySurvey(a.slug) ? 0 : 1;
-    const bTaken = getRankingBySurvey(b.slug) ? 0 : 1;
-    return aTaken - bTaken;
-  });
-
   const divorceData = getRankingBySurvey('divorce_risk');
   const appearanceData = getRankingBySurvey('physical_appearance_survey');
 
@@ -97,6 +79,7 @@ export default function Dashboard() {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Chance of Divorce */}
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-lg font-semibold text-gray-700">Chance of Divorce</h2>
@@ -106,22 +89,22 @@ export default function Dashboard() {
                   {(divorceData?.total_score * 100).toFixed(0)}%
                 </p>
                 <p className="text-sm text-gray-500 mt-1">
-                  Top {(filteredDivorce?.percentile_rank * 100 || divorceData?.percentile_rank * 100).toFixed(0)}% of users
+                  Top {(filteredDivorce?.percentile_rank * 100 ?? divorceData?.percentile_rank * 100).toFixed(0)}% of users
                 </p>
               </div>
 
+              {/* Divorce Percentile + Filter */}
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-lg font-semibold text-gray-700">Percentile Rank</h2>
                   <BarChart2 className="w-5 h-5 text-green-500" />
                 </div>
                 <p className="text-4xl font-bold text-green-600">
-                  {(filteredDivorce?.percentile_rank * 100 || divorceData?.percentile_rank * 100).toFixed(0)}%
+                  {(filteredDivorce?.percentile_rank * 100 ?? divorceData?.percentile_rank * 100).toFixed(0)}%
                 </p>
                 <p className="text-sm text-gray-500 mt-1">
-                  Top {filteredDivorce?.rank || divorceData?.rank} among users
+                  Top {filteredDivorce?.rank ?? divorceData?.rank} among users
                 </p>
-
                 <FilteredRankCard
                   user={{
                     email: sessionEmail,
@@ -133,6 +116,7 @@ export default function Dashboard() {
                 />
               </div>
 
+              {/* Email */}
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-lg font-semibold text-gray-700">Email Linked</h2>
@@ -142,7 +126,9 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* Physical Metrics */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+              {/* Physical Score */}
               <div className="rounded-2xl shadow-sm p-6 border border-gray-200 bg-white">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-lg font-semibold text-gray-700">Physical Appearance Score</h2>
@@ -154,7 +140,7 @@ export default function Dashboard() {
                       {appearanceData.total_score}
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      Top {(filteredAppearance?.percentile_rank * 100 || appearanceData?.percentile_rank * 100).toFixed(0)}% of users
+                      Top {(filteredAppearance?.percentile_rank * 100 ?? appearanceData?.percentile_rank * 100).toFixed(0)}% of users
                     </p>
                   </>
                 ) : (
@@ -164,6 +150,7 @@ export default function Dashboard() {
                 )}
               </div>
 
+              {/* Physical Percentile + Filter */}
               <div className="rounded-2xl shadow-sm p-6 border border-gray-200 bg-white">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-lg font-semibold text-gray-700">Physical Percentile</h2>
@@ -172,12 +159,11 @@ export default function Dashboard() {
                 {appearanceData ? (
                   <>
                     <p className="text-4xl font-bold text-green-600">
-                      {(filteredAppearance?.percentile_rank * 100 || appearanceData?.percentile_rank * 100).toFixed(0)}%
+                      {(filteredAppearance?.percentile_rank * 100 ?? appearanceData?.percentile_rank * 100).toFixed(0)}%
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      Top {filteredAppearance?.rank || appearanceData?.rank} among users
+                      Top {filteredAppearance?.rank ?? appearanceData?.rank} among users
                     </p>
-
                     <FilteredRankCard
                       user={{
                         email: sessionEmail,
