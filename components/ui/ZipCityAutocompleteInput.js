@@ -103,10 +103,11 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
               className="px-4 py-2 cursor-pointer hover:bg-gray-100"
               onClick={() => handleSelect(loc)}
             >
-              {loc.zip} – {loc.city}, {isoCountryMap[loc.country] || loc.country}
+              {loc.zip} – {loc.city} , {loc.state} 
+              {loc.country ? `, ${isoCountryMap[loc.country] || loc.country}` : ""}
             </li>
-          ))}
-        </ul>
+        ))}
+      </ul>
       )}
     </div>
   );
