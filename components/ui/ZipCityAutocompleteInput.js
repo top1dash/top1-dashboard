@@ -73,8 +73,9 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
   };
 
   const handleSelect = (location) => {
-    const fullCountryName = isoCountryMap[location.country_code] || location.country_code;
+    const fullCountryName = isoCountryMap[location.country] || location.country;
 
+    console.log("Selected location:", location);
     setQuery(`${location.zip} – ${location.city}`);
     setIsDropdownOpen(false);
     setSuggestions([]);
