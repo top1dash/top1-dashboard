@@ -46,31 +46,31 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
 
   // Step 3: Debounced input + fuzzy search (filtered by user country)
   const handleInputChange = (e) => {
-    const value = e.target.value;
-    setQuery(value);
-    setIsDropdownOpen(true);
+  const value = e.target.value;
+  setQuery(value);
+  setIsDropdownOpen(true);
 
-    clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      if (!value || !userCountry) return setSuggestions([]);
+  clearTimeout(timeoutRef.current);
+  timeoutRef.current = setTimeout(() => {
+    if (!value) return setSuggestions([]);
 
-      const filtered = allLocations.filter((loc) => loc.country === userCountry);
-      const fuse = new Fuse(filtered, {
-        keys: ["zip", "city"],
-        threshold: 0.3,
-      });
+    const fuse = new Fuse(allLocations, {
+      keys: ["zip", "city"],
+      threshold: 0.3, // still useful for cities
+    });
 
-      const results = fuse.search(value).map((r) => r.item);
+    const results = fuse.search(value).map((r) => r.item);
 
-        // Only keep results where the ZIP or city *starts with* the typed query
-        const filteredResults = results.filter(
-          (r) =>
-            r.zip?.toString().startsWith(value.toString()) ||
-            r.city?.toLowerCase().startsWith(value.toLowerCase())
-        );
-      setSuggestions(results.slice(0, 8));
-    }, 250);
-  };
+    // Strict prefix match
+    const filteredResults = results.filter(
+      (r) =>
+        r.zip?.toString().startsWith(value.toString()) ||
+        r.city?.toLowerCase().startsWith(value.toLowerCase())
+    );
+
+    setSuggestions(filteredResults.slice(0, 10)); // can change back to 8 if preferred
+  }, 250);
+};
 
   // Step 4: Handle selection
   const handleSelect = (location) => {
