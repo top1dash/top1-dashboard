@@ -6,26 +6,28 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [allLocations, setAllLocations] = useState([]);
-  const [userCountry, setUserCountry] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [countryName, setCountryName] = useState(""); // ✅ NEW state
   const timeoutRef = useRef(null);
 
-  // Step 1: Detect user's country from IP
+  // Step 1: IP-based country detection
   useEffect(() => {
     const detectCountry = async () => {
       try {
         const res = await fetch("https://ipapi.co/json");
         const data = await res.json();
-        setUserCountry(data.country_name); // e.g., "United States"
-        console.log("🌎 IP-based country:", data.country_name);
+        console.log("🌍 IP-based country:", data.country_name);
+        setCountryName(data.country_name); // ✅ Set full name like "United States"
       } catch (err) {
-        console.error("❌ IP detection failed:", err);
+        console.error("🌐 IP detection failed:", err);
+        setCountryName("United States"); // Fallback
       }
     };
+
     detectCountry();
   }, []);
 
-  // Step 2: Load and decompress the global ZIP dataset
+  // Step 2: Load ZIP dataset
   useEffect(() => {
     const fetchZipCityData = async () => {
       const url = `https://hwafvupabcnhialqqgxy.supabase.co/storage/v1/object/public/public-data/zip_city_global_FIXED.json.gz`;
@@ -35,49 +37,52 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
         const buffer = await response.arrayBuffer();
         const decompressed = inflate(new Uint8Array(buffer), { to: "string" });
         const json = JSON.parse(decompressed);
+        console.log(`✅ Loaded ${json.length} entries from ZIP DB`);
         setAllLocations(json);
-        console.log("✅ Loaded", json.length, "entries from ZIP DB");
       } catch (error) {
-        console.error("❌ Failed to load ZIP data:", error);
+        console.error("❌ Error loading ZIP/city data:", error);
       }
     };
+
     fetchZipCityData();
   }, []);
 
-  // Step 3: Debounced input + fuzzy search (filtered by user country)
+  // Step 3: Debounced input + fuzzy search
   const handleInputChange = (e) => {
-  const value = e.target.value;
-  setQuery(value);
-  setIsDropdownOpen(true);
+    const value = e.target.value;
+    setQuery(value);
+    setIsDropdownOpen(true);
 
-  clearTimeout(timeoutRef.current);
-  timeoutRef.current = setTimeout(() => {
-    if (!value) return setSuggestions([]);
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      if (!value) return setSuggestions([]);
 
-    const filteredByCountry = allLocations.filter(
-    (loc) => loc.country === countryName
-    );
-    const fuse = new Fuse(allLocations, {
-      keys: ["zip", "city"],
-      threshold: 0.1, // still useful for cities
-    });
+      // ✅ Filter locations by country before fuzzy searching
+      const filteredByCountry = allLocations.filter(
+        (loc) => loc.country === countryName
+      );
 
-    const results = fuse.search(value).map((r) => r.item);
+      const fuse = new Fuse(filteredByCountry, {
+        keys: ["zip", "city"],
+        threshold: 0.1,
+      });
 
-    // Strict prefix match
-    const filteredResults = results.filter(
-      (r) =>
-        r.zip?.toString().startsWith(value.toString()) ||
-        r.city?.toLowerCase().startsWith(value.toLowerCase())
-    );
+      const results = fuse.search(value).map((r) => r.item);
 
-    setSuggestions(filteredResults.slice(0, 10)); // can change back to 8 if preferred
-  }, 250);
-};
+      // ✅ Only show results that *start with* the typed query
+      const filteredResults = results.filter(
+        (r) =>
+          r.zip.toString().startsWith(value.toString()) ||
+          r.city.toLowerCase().startsWith(value.toLowerCase())
+      );
 
-  // Step 4: Handle selection
+      setSuggestions(filteredResults.slice(0, 10));
+    }, 250);
+  };
+
   const handleSelect = (location) => {
     console.log("🎯 Selected location:", location);
+
     setQuery(`${location.zip} – ${location.city}`);
     setIsDropdownOpen(false);
     setSuggestions([]);
