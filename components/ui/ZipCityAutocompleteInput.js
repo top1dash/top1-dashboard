@@ -81,7 +81,7 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
     onChange(questionId, {
       zip: location.zip,
       city: location.city,
-      country_code: location.country_code,
+      country: fullCountryName, // ✅ use the name instead of code
     });
   };
 
