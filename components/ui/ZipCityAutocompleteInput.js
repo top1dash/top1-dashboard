@@ -2,8 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import Fuse from "fuse.js";
 import { inflate } from "pako";
 import countryToRegionMap from "./countryToRegionMap";
-import isoCountryMap from "./isoCountryMap"; // adjust path as needed
-
+import isoCountryMap from "./isoCountryMap";
 
 export default function ZipCityAutocompleteInput({ questionId, onChange }) {
   const [query, setQuery] = useState("");
@@ -19,7 +18,7 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
       try {
         const res = await fetch("https://ipapi.co/json");
         const data = await res.json();
-        const userCountryCode = data.country; // e.g., "IN", "FR", "US"
+        const userCountryCode = data.country; // e.g., "US", "FR"
         const mappedRegion = countryToRegionMap[userCountryCode] || "us";
         setRegion(mappedRegion);
       } catch (err) {
@@ -31,7 +30,7 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
     detectRegion();
   }, []);
 
-  // Step 2: Fetch & decompress JSON.gz file for that region
+  // Step 2: Load and decompress regional ZIP data
   useEffect(() => {
     const fetchZipCityData = async () => {
       const url = `https://hwafvupabcnhialqqgxy.supabase.co/storage/v1/object/public/public-data/zip_city_${region}.json.gz`;
@@ -41,9 +40,10 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
         const buffer = await response.arrayBuffer();
         const decompressed = inflate(new Uint8Array(buffer), { to: "string" });
         const json = JSON.parse(decompressed);
+        console.log("✅ Loaded zip data sample:", json[0]);
         setAllLocations(json);
       } catch (error) {
-        console.error("Error loading ZIP/city data:", error);
+        console.error("❌ Error loading ZIP/city data:", error);
       }
     };
 
@@ -52,7 +52,7 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
     }
   }, [region]);
 
-  // Step 3: Fuzzy search with Fuse
+  // Step 3: Fuzzy search handler
   const handleInputChange = (e) => {
     const value = e.target.value;
     setQuery(value);
@@ -68,24 +68,29 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
       });
 
       const results = fuse.search(value).map((r) => r.item);
+      console.log("🔍 Suggestions sample:", results[0]);
       setSuggestions(results.slice(0, 8));
     }, 250);
   };
 
+  // Step 4: Handle user selecting a suggestion
   const handleSelect = (location) => {
     const fullCountryName = isoCountryMap[location.country] || location.country;
+    console.log("🎯 Selected location:", location);
 
-    console.log("Selected location:", location);
     setQuery(`${location.zip} – ${location.city}`);
     setIsDropdownOpen(false);
     setSuggestions([]);
+
     onChange(questionId, {
       zip: location.zip,
       city: location.city,
-      country: fullCountryName, // ✅ use the name instead of code
+      state: location.state,
+      country: fullCountryName,
     });
   };
 
+  // Render
   return (
     <div className="relative">
       <input
@@ -103,13 +108,13 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
               className="px-4 py-2 cursor-pointer hover:bg-gray-100"
               onClick={() => handleSelect(loc)}
             >
-              {loc.zip} – {loc.city} , {loc.state} 
-              {loc.country ? `, ${isoCountryMap[loc.country] || loc.country}` : ""}
+              {loc.zip || "no-zip"} – {loc.city || "no-city"},{" "}
+              {loc.state || "no-state"},{" "}
+              {isoCountryMap[loc.country] || loc.country || "no-country"}
             </li>
-        ))}
-      </ul>
+          ))}
+        </ul>
       )}
     </div>
   );
 }
-
