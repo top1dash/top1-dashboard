@@ -54,6 +54,9 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
   timeoutRef.current = setTimeout(() => {
     if (!value) return setSuggestions([]);
 
+    const filteredByCountry = allLocations.filter(
+    (loc) => loc.country === countryName
+    );
     const fuse = new Fuse(allLocations, {
       keys: ["zip", "city"],
       threshold: 0.1, // still useful for cities
