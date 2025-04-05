@@ -6,10 +6,26 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [allLocations, setAllLocations] = useState([]);
+  const [userCountry, setUserCountry] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const timeoutRef = useRef(null);
 
-  // Load and decompress the unified global ZIP data
+  // Step 1: Detect user's country from IP
+  useEffect(() => {
+    const detectCountry = async () => {
+      try {
+        const res = await fetch("https://ipapi.co/json");
+        const data = await res.json();
+        setUserCountry(data.country_name); // e.g., "United States"
+        console.log("🌎 IP-based country:", data.country_name);
+      } catch (err) {
+        console.error("❌ IP detection failed:", err);
+      }
+    };
+    detectCountry();
+  }, []);
+
+  // Step 2: Load and decompress the global ZIP dataset
   useEffect(() => {
     const fetchZipCityData = async () => {
       const url = `https://hwafvupabcnhialqqgxy.supabase.co/storage/v1/object/public/public-data/zip_city_global_FIXED.json.gz`;
@@ -19,17 +35,16 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
         const buffer = await response.arrayBuffer();
         const decompressed = inflate(new Uint8Array(buffer), { to: "string" });
         const json = JSON.parse(decompressed);
-        console.log("✅ Loaded ZIP dataset:", json.length, "entries");
         setAllLocations(json);
+        console.log("✅ Loaded", json.length, "entries from ZIP DB");
       } catch (error) {
-        console.error("❌ Error loading ZIP/city data:", error);
+        console.error("❌ Failed to load ZIP data:", error);
       }
     };
-
     fetchZipCityData();
   }, []);
 
-  // Debounced search with Fuse.js
+  // Step 3: Debounced input + fuzzy search (filtered by user country)
   const handleInputChange = (e) => {
     const value = e.target.value;
     setQuery(value);
@@ -37,9 +52,10 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
 
     clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
-      if (!value) return setSuggestions([]);
+      if (!value || !userCountry) return setSuggestions([]);
 
-      const fuse = new Fuse(allLocations, {
+      const filtered = allLocations.filter((loc) => loc.country === userCountry);
+      const fuse = new Fuse(filtered, {
         keys: ["zip", "city"],
         threshold: 0.3,
       });
@@ -49,9 +65,9 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
     }, 250);
   };
 
+  // Step 4: Handle selection
   const handleSelect = (location) => {
     console.log("🎯 Selected location:", location);
-
     setQuery(`${location.zip} – ${location.city}`);
     setIsDropdownOpen(false);
     setSuggestions([]);
