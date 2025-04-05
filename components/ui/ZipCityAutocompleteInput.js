@@ -61,7 +61,6 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
       });
 
       const results = fuse.search(value).map((r) => r.item);
-      const results = fuse.search(value).map((r) => r.item);
 
         // Only keep results where the ZIP or city *starts with* the typed query
         const filteredResults = results.filter(
