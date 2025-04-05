@@ -64,7 +64,7 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
 
       const fuse = new Fuse(filteredByCountry, {
         keys: ["zip", "city"],
-        threshold: 0.2,
+        threshold: 0.3,
       });
 
       const results = fuse.search(value).map((r) => r.item);
