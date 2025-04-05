@@ -102,7 +102,7 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
               className="px-4 py-2 cursor-pointer hover:bg-gray-100"
               onClick={() => handleSelect(loc)}
             >
-              {loc.zip} – {loc.city}, {loc.country_code}
+              {loc.zip} – {loc.city}, {isoCountryMap[loc.country_code] || loc.country_code}
             </li>
           ))}
         </ul>
