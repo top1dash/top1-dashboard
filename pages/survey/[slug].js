@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../../supabaseClient';
 import CollegeAutocompleteInput from "../../components/ui/CollegeAutocompleteInput";
+import ZipCityAutocompleteInput from "../../components/ui/ZipCityAutocompleteInput";
 
 
 function AddressAutocompleteInput({ questionId, onChange }) {
@@ -223,8 +224,14 @@ export default function SurveySlugPage() {
             <CollegeAutocompleteInput
             questionId={q.id}
             onChange={handleChange}
-      />
-    )}     
+              />
+            )}  
+              {q.type === "zip_city_autocomplete" && (
+              <ZipCityAutocompleteInput
+                questionId={q.id}
+                onChange={handleChange}
+              />
+            )}
           </div>
         ))}
 
