@@ -93,7 +93,8 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
   const handleSelect = (location) => {
     console.log("🎯 Selected location:", location);
 
-    setQuery(`${location.zip} – ${location.city}`);
+    setQuery(`${location.zip} – ${location.city}`), ${location.state}, ${location.country}`);
+;
     setIsDropdownOpen(false);
     setSuggestions([]);
 
