@@ -110,7 +110,7 @@ export default function Dashboard() {
                       {(divorceData?.total_score * 100).toFixed(0)}%
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      Top {(filteredDivorce?.percentile_rank * 100 || divorceData?.percentile_rank * 100).toFixed(0)}% of users
+                      Top {((filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100).toFixed(0)}% of users
                     </p>
                   </>
                 ) : (
@@ -128,10 +128,10 @@ export default function Dashboard() {
                 {divorceData ? (
                   <>
                     <p className="text-4xl font-bold text-green-600">
-                      {(filteredDivorce?.percentile_rank * 100 || divorceData?.percentile_rank * 100).toFixed(0)}%
+                      {(filteredDivorce?.percentile ?? divorceData?.percentile_rank * 100).toFixed(0)}%
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      Top {filteredDivorce?.rank || divorceData?.rank} among users
+                      Top {filteredDivorce?.rank ?? divorceData?.rank} among users
                     </p>
 
                     <FilteredRankCard
@@ -179,7 +179,7 @@ export default function Dashboard() {
                       {appearanceData.total_score}
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      Top {(filteredAppearance?.percentile_rank * 100 || appearanceData?.percentile_rank * 100).toFixed(0)}% of users
+                      Top {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}% of users
                     </p>
                   </>
                 ) : (
@@ -197,7 +197,7 @@ export default function Dashboard() {
                 {appearanceData ? (
                   <>
                     <p className="text-4xl font-bold text-green-600">
-                      {(filteredAppearance?.percentile_rank * 100 || appearanceData?.percentile_rank * 100).toFixed(0)}%
+                      {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}%
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
                       Top {filteredAppearance?.rank || appearanceData?.rank} among users
