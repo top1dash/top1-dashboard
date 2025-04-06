@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Skeleton } from './ui/skeleton';
 import { supabase } from '../supabaseClient';
 import FilterChips from './FilterChips';
 
@@ -26,7 +25,6 @@ export default function FilteredRankCard({ user, surveyName, updatedAt, onUpdate
         state: activeFilter === 'state' ? user.state : null,
         country: activeFilter === 'country' ? user.country : null,
         school: activeFilter === 'school' ? user.school : null,
-        
       };
 
       console.log(`📡 Fetching filtered rank for:`, filters);
@@ -47,7 +45,7 @@ export default function FilteredRankCard({ user, surveyName, updatedAt, onUpdate
 
       if (response.ok) {
         console.log(`✅ Filtered result from Supabase:`, data);
-        onUpdate?.(activeFilter === 'all' ? null : data); // Pass null to reset
+        onUpdate?.(activeFilter === 'all' ? null : data);
       } else {
         console.error('❌ Supabase function error:', data?.error || 'Unknown');
         onUpdate?.(null);
@@ -64,14 +62,18 @@ export default function FilteredRankCard({ user, surveyName, updatedAt, onUpdate
   }, [activeFilter, surveyName]);
 
   return (
-    <div className="mt-2 flex justify-center">
-      <FilterChips activeFilter={activeFilter} onFilterChange={setActiveFilter} />
-          {updatedAt && (
-        <p className="text-sm text-gray-400 mt-2 text-center">
+    <div className="mt-2 flex flex-col items-center">
+      <FilterChips
+        options={FILTER_OPTIONS}
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+      />
+
+      {updatedAt && (
+        <p className="text-sm text-gray-400 mt-2">
           Last updated: {new Date(updatedAt).toLocaleDateString()}
         </p>
       )}
-
     </div>
   );
 }
