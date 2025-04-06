@@ -20,7 +20,7 @@ export default function FilteredRankCard({ user, surveyName, updatedAt, onUpdate
         survey_name: surveyName,
         gender: user.gender, // always included
         age: activeFilter === 'age' ? user.age : null,
-        zip_code: activeFilter === 'zip_code' ? user.zip_code : null,
+        zip: activeFilter === 'zip_code' ? user.zip_code : null,
         city: activeFilter === 'city' ? user.city : null,
         state: activeFilter === 'state' ? user.state : null,
         country: activeFilter === 'country' ? user.country : null,
