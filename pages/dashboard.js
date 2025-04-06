@@ -139,7 +139,7 @@ export default function Dashboard() {
                       email: sessionEmail,
                       gender: userRankings[0]?.gender || 'default',
                       age: userRankings[0]?.age || 'default',
-                      zip_code: userRankings[0]?.zip_code || null,
+                      zip: userRankings[0]?.zip_code || null,
                       city: userRankings[0]?.city || null,
                       state: userRankings[0]?.state || null,
                       country: userRankings[0]?.country || null,
