@@ -136,10 +136,16 @@ export default function Dashboard() {
 
                     <FilteredRankCard
                       user={{
-                        email: sessionEmail,
-                        gender: userRankings[0]?.gender || 'default',
-                        age: userRankings[0]?.age || 'default',
-                      }}
+                      email: sessionEmail,
+                      gender: userRankings[0]?.gender || 'default',
+                      age: userRankings[0]?.age || 'default',
+                      zip_code: userRankings[0]?.zip_code || null,
+                      city: userRankings[0]?.city || null,
+                      state: userRankings[0]?.state || null,
+                      country: userRankings[0]?.country || null,
+                      school: userRankings[0]?.school || null,
+                    }}
+
                       surveyName="divorce_risk"
                       updatedAt={divorceData?.updated_at}
                       onUpdate={setFilteredDivorce}
