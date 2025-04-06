@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Skeleton } from './ui/skeleton';
 import { supabase } from '../supabaseClient';
 import FilterChips from './FilterChips';
 
@@ -8,21 +7,6 @@ const FILTER_OPTIONS = ['all', 'age', 'zip/postal_code', 'city', 'state', 'count
 export default function FilteredRankCard({ user, surveyName, updatedAt, onUpdate }) {
   const [activeFilter, setActiveFilter] = useState('all');
   const [loading, setLoading] = useState(true);
-  const [surveyConfig, setSurveyConfig] = useState({ higher_is_better: true });
-
-  useEffect(() => {
-    const fetchSurveyConfig = async () => {
-      const { data, error } = await supabase
-        .from('survey_config')
-        .select('higher_is_better')
-        .eq('survey_name', surveyName)
-        .single();
-
-      if (data) setSurveyConfig(data);
-    };
-
-    fetchSurveyConfig();
-  }, [surveyName]);
 
   const fetchRank = async () => {
     setLoading(true);
@@ -34,7 +18,7 @@ export default function FilteredRankCard({ user, surveyName, updatedAt, onUpdate
       const filters = {
         email: user.email,
         survey_name: surveyName,
-        gender: user.gender,
+        gender: user.gender, // always included
         age: activeFilter === 'age' ? user.age : null,
         zip: activeFilter === 'zip/postal_code' ? user.zip : null,
         city: activeFilter === 'city' ? user.city : null,
@@ -43,7 +27,7 @@ export default function FilteredRankCard({ user, surveyName, updatedAt, onUpdate
         school: activeFilter === 'school' ? user.school : null,
       };
 
-      console.log('📡 Fetching filtered rank for:', filters);
+      console.log(`📡 Fetching filtered rank for:`, filters);
 
       const response = await fetch(
         'https://hwafvupabcnhialqqgxy.supabase.co/functions/v1/get-filtered-rank',
@@ -60,15 +44,8 @@ export default function FilteredRankCard({ user, surveyName, updatedAt, onUpdate
       const data = await response.json();
 
       if (response.ok) {
-        const adjustedData =
-          surveyConfig.higher_is_better || data.percentile === null
-            ? data
-            : {
-                ...data,
-                percentile: 1 - data.percentile,
-              };
-
-        onUpdate?.(activeFilter === 'all' ? null : adjustedData);
+        console.log(`✅ Filtered result from Supabase:`, data);
+        onUpdate?.(activeFilter === 'all' ? null : data);
       } else {
         console.error('❌ Supabase function error:', data?.error || 'Unknown');
         onUpdate?.(null);
@@ -82,11 +59,21 @@ export default function FilteredRankCard({ user, surveyName, updatedAt, onUpdate
 
   useEffect(() => {
     fetchRank();
-  }, [activeFilter, surveyName, surveyConfig]);
+  }, [activeFilter, surveyName]);
 
   return (
-    <div className="mt-2 flex justify-center">
-      <FilterChips activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+    <div className="mt-2 flex flex-col items-center">
+      <FilterChips
+        options={FILTER_OPTIONS}
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+      />
+
+      {updatedAt && (
+        <p className="text-sm text-gray-400 mt-2">
+          Last updated: {new Date(updatedAt).toLocaleDateString()}
+        </p>
+      )}
     </div>
   );
 }
