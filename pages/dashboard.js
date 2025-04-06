@@ -36,10 +36,12 @@ export default function Dashboard() {
       const userEmail = session.user.email;
       setSessionEmail(userEmail);
 
+      // Updated query: Order by updated_at descending so that the newest submission comes first
       const { data, error } = await supabase
         .from('rankings')
         .select('*')
-        .eq('email', userEmail);
+        .eq('email', userEmail)
+        .order('updated_at', { ascending: false });
 
       console.log('🔍 Supabase returned user rankings:', data);
       console.log('❗ Any Supabase error?', error);
