@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import { supabase } from '../supabaseClient';
 import Modal from '../components/Modal';
 import FilteredRankCard from '../components/FilteredRankCard';
-import { ErrorBoundary } from '../components/ErrorBoundary';
 import { ShieldCheck, BarChart2, Mail } from 'lucide-react';
 import Link from 'next/link';
 
@@ -28,28 +27,23 @@ export default function Dashboard() {
       } = await supabase.auth.getSession();
 
       if (!session || !session.user) {
-        console.warn('No valid user session found. Redirecting to login...');
-        router.push('/login');
+        setTimeout(() => {
+          router.push('/login');
+        }, 0);
         return;
       }
 
       const userEmail = session.user.email;
       setSessionEmail(userEmail);
 
-      // Updated query: Order by updated_at descending so that the newest submission comes first
       const { data, error } = await supabase
         .from('rankings')
         .select('*')
         .eq('email', userEmail)
         .order('updated_at', { ascending: false });
 
-      console.log('🔍 Supabase returned user rankings:', data);
-      console.log('❗ Any Supabase error?', error);
-
       if (!error && data) {
         setUserRankings(data);
-      } else {
-        console.warn('No user ranking data found or error occurred.');
       }
 
       setLoading(false);
@@ -76,19 +70,13 @@ export default function Dashboard() {
   const getRankingBySurvey = (slug) =>
     userRankings.find((r) => r.survey_name === slug);
 
-  const sortedSurveys = [...SURVEYS].sort((a, b) => {
-    const aTaken = getRankingBySurvey(a.slug) ? 0 : 1;
-    const bTaken = getRankingBySurvey(b.slug) ? 0 : 1;
-    return aTaken - bTaken;
-  });
-
+  const latestUserRanking = userRankings?.[0] || {};
   const divorceData = getRankingBySurvey('divorce_risk');
   const appearanceData = getRankingBySurvey('physical_appearance_survey');
 
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4">
       <Modal show={showModal} onClose={handleCloseModal} onStartSurvey={handleStartSurvey} />
-
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold mb-8 text-gray-800">
           Welcome{sessionEmail ? `, ${sessionEmail}` : ''} 👋
@@ -99,6 +87,7 @@ export default function Dashboard() {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Divorce Stat */}
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-lg font-semibold text-gray-700">Chance of Divorce</h2>
@@ -110,7 +99,7 @@ export default function Dashboard() {
                       {(divorceData?.total_score * 100).toFixed(0)}%
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      Top {(filteredDivorce?.percentile_rank * 100 || divorceData?.percentile_rank * 100).toFixed(0)}% of users
+                      Top {((filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100).toFixed(0)}% of users
                     </p>
                   </>
                 ) : (
@@ -120,6 +109,7 @@ export default function Dashboard() {
                 )}
               </div>
 
+              {/* Divorce Percentile */}
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-lg font-semibold text-gray-700">Percentile Rank</h2>
@@ -128,29 +118,31 @@ export default function Dashboard() {
                 {divorceData ? (
                   <>
                     <p className="text-4xl font-bold text-green-600">
-                      {(filteredDivorce?.percentile_rank * 100 || divorceData?.percentile_rank * 100).toFixed(0)}%
+                      {(filteredDivorce?.percentile ?? divorceData?.percentile_rank * 100).toFixed(0)}%
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      Top {filteredDivorce?.rank || divorceData?.rank} among users
+                      Top {filteredDivorce?.rank ?? divorceData?.rank} among users
                     </p>
-
                     <FilteredRankCard
                       user={{
                         email: sessionEmail,
-                        gender: userRankings[0]?.gender || 'default',
-                        age: userRankings[0]?.age || 'default',
+                        gender: latestUserRanking.gender || 'default',
+                        age: latestUserRanking.age || 'default',
+                        zip: latestUserRanking.zip || null,
+                        city: latestUserRanking.city || null,
+                        state: latestUserRanking.state || null,
+                        country: latestUserRanking.country || null,
+                        school: latestUserRanking.school || null,
                       }}
                       surveyName="divorce_risk"
+                      updatedAt={divorceData?.updated_at}
                       onUpdate={setFilteredDivorce}
                     />
                   </>
-                ) : (
-                  <Link href="/survey/divorce_risk">
-                    <a className="text-blue-600 font-medium hover:underline">Take now!</a>
-                  </Link>
-                )}
+                ) : null}
               </div>
 
+              {/* Email Card */}
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-lg font-semibold text-gray-700">Email Linked</h2>
@@ -160,6 +152,7 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* Appearance Survey */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
               <div className="rounded-2xl shadow-sm p-6 border border-gray-200 bg-white">
                 <div className="flex items-center justify-between mb-3">
@@ -172,14 +165,10 @@ export default function Dashboard() {
                       {appearanceData.total_score}
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      Top {(filteredAppearance?.percentile_rank * 100 || appearanceData?.percentile_rank * 100).toFixed(0)}% of users
+                      Top {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}% of users
                     </p>
                   </>
-                ) : (
-                  <Link href="/survey/physical_appearance_survey">
-                    <a className="text-blue-600 font-medium hover:underline">Take now!</a>
-                  </Link>
-                )}
+                ) : null}
               </div>
 
               <div className="rounded-2xl shadow-sm p-6 border border-gray-200 bg-white">
@@ -190,27 +179,23 @@ export default function Dashboard() {
                 {appearanceData ? (
                   <>
                     <p className="text-4xl font-bold text-green-600">
-                      {(filteredAppearance?.percentile_rank * 100 || appearanceData?.percentile_rank * 100).toFixed(0)}%
+                      {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}%
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
                       Top {filteredAppearance?.rank || appearanceData?.rank} among users
                     </p>
-
                     <FilteredRankCard
                       user={{
                         email: sessionEmail,
-                        gender: userRankings[0]?.gender || 'default',
-                        age: userRankings[0]?.age || 'default',
+                        gender: latestUserRanking.gender || 'default',
+                        age: latestUserRanking.age || 'default',
                       }}
                       surveyName="physical_appearance_survey"
+                      updatedAt={appearanceData?.updated_at}
                       onUpdate={setFilteredAppearance}
                     />
                   </>
-                ) : (
-                  <Link href="/survey/physical_appearance_survey">
-                    <a className="text-blue-600 font-medium hover:underline">Take now!</a>
-                  </Link>
-                )}
+                ) : null}
               </div>
             </div>
           </>
