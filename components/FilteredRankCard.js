@@ -19,9 +19,6 @@ export default function FilteredRankCard({ user, surveyName, updatedAt, onUpdate
       const filters = {
         email: user.email,
         survey_name: surveyName,
-        const filters = {
-        email: user.email,
-        survey_name: surveyName,
         gender: user.gender, // always included
         age: activeFilter === 'age' ? user.age : null,
         zip_code: activeFilter === 'zip_code' ? user.zip_code : null,
