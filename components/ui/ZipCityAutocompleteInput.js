@@ -9,6 +9,7 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
   const [countryOptions, setCountryOptions] = useState([]); // NEW state for drop-down options
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [countryName, setCountryName] = useState(""); // Existing state for current country
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1); // NEW: for keyboard navigation
   const timeoutRef = useRef(null);
 
   // Step 1: IP-based country detection
@@ -57,6 +58,11 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
     }
   }, [allLocations]);
 
+  // NEW: Reset active suggestion index when suggestions change
+  useEffect(() => {
+    setActiveSuggestionIndex(-1);
+  }, [suggestions]);
+
   // Step 3: Debounced input + fuzzy search
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -90,11 +96,29 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
     }, 250);
   };
 
+  // NEW: Keyboard navigation handler
+  const handleInputKeyDown = (e) => {
+    if (e.key === "ArrowDown") {
+      if (activeSuggestionIndex < suggestions.length - 1) {
+        setActiveSuggestionIndex(activeSuggestionIndex + 1);
+      }
+    } else if (e.key === "ArrowUp") {
+      if (activeSuggestionIndex > 0) {
+        setActiveSuggestionIndex(activeSuggestionIndex - 1);
+      }
+    } else if (e.key === "Enter") {
+      if (activeSuggestionIndex >= 0 && activeSuggestionIndex < suggestions.length) {
+        e.preventDefault(); // prevent form submission
+        handleSelect(suggestions[activeSuggestionIndex]);
+      }
+    }
+  };
+
   const handleSelect = (location) => {
     console.log("🎯 Selected location:", location);
 
-    setQuery(`${location.zip} – ${location.city}`), ${location.state}, ${location.country}`);
-;
+    // Update the query to show ZIP, city, state, and country
+    setQuery(`${location.zip} – ${location.city}, ${location.state}, ${location.country}`);
     setIsDropdownOpen(false);
     setSuggestions([]);
 
@@ -130,6 +154,7 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
         placeholder="Start typing your ZIP code or city..."
         value={query}
         onChange={handleInputChange}
+        onKeyDown={handleInputKeyDown} // NEW: enables keyboard navigation
         className="border border-gray-300 rounded px-4 py-2 w-full"
       />
       {isDropdownOpen && suggestions.length > 0 && (
@@ -137,7 +162,7 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
           {suggestions.map((loc, idx) => (
             <li
               key={idx}
-              className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+              className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${idx === activeSuggestionIndex ? "bg-gray-200" : ""}`}
               onClick={() => handleSelect(loc)}
             >
               {loc.zip || "no-zip"} – {loc.city || "no-city"},{" "}
