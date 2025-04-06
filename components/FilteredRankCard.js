@@ -3,7 +3,7 @@ import { Skeleton } from './ui/skeleton';
 import { supabase } from '../supabaseClient';
 import FilterChips from './FilterChips';
 
-const FILTER_OPTIONS = ['all', 'gender', 'age'];
+const FILTER_OPTIONS = ['all', 'age', 'zip_code', 'city', 'state', 'country', 'school'];
 
 export default function FilteredRankCard({ user, surveyName, updatedAt, onUpdate }) {
   const [activeFilter, setActiveFilter] = useState('all');
@@ -19,8 +19,17 @@ export default function FilteredRankCard({ user, surveyName, updatedAt, onUpdate
       const filters = {
         email: user.email,
         survey_name: surveyName,
-        gender: activeFilter === 'gender' ? user.gender : null,
+        const filters = {
+        email: user.email,
+        survey_name: surveyName,
+        gender: user.gender, // always included
         age: activeFilter === 'age' ? user.age : null,
+        zip_code: activeFilter === 'zip_code' ? user.zip_code : null,
+        city: activeFilter === 'city' ? user.city : null,
+        state: activeFilter === 'state' ? user.state : null,
+        country: activeFilter === 'country' ? user.country : null,
+        school: activeFilter === 'school' ? user.school : null,
+        
       };
 
       console.log(`📡 Fetching filtered rank for:`, filters);
