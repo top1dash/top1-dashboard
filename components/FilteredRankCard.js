@@ -5,7 +5,7 @@ import FilterChips from './FilterChips';
 
 const FILTER_OPTIONS = ['all', 'gender', 'age'];
 
-export default function FilteredRankCard({ user, surveyName, onUpdate }) {
+export default function FilteredRankCard({ user, surveyName, updatedAt, onUpdate }) {
   const [activeFilter, setActiveFilter] = useState('all');
   const [loading, setLoading] = useState(true);
 
@@ -60,6 +60,12 @@ export default function FilteredRankCard({ user, surveyName, onUpdate }) {
   return (
     <div className="mt-2 flex justify-center">
       <FilterChips activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+          {updatedAt && (
+        <p className="text-sm text-gray-400 mt-2 text-center">
+          Last updated: {new Date(updatedAt).toLocaleDateString()}
+        </p>
+      )}
+
     </div>
   );
 }
