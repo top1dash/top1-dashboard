@@ -7,6 +7,10 @@ export default function CollegeAutocompleteInput({ questionId, onChange }) {
   const [suggestions, setSuggestions] = useState([]);
   const [allColleges, setAllColleges] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // NEW: Track which suggestion is currently highlighted for keyboard navigation
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+
   const timeoutRef = useRef(null);
 
   useEffect(() => {
@@ -27,6 +31,11 @@ export default function CollegeAutocompleteInput({ questionId, onChange }) {
     fetchColleges();
   }, []);
 
+  // NEW: Reset active suggestion index whenever the suggestions list changes
+  useEffect(() => {
+    setActiveSuggestionIndex(-1);
+  }, [suggestions]);
+
   const handleInputChange = (e) => {
     const value = e.target.value;
     setQuery(value);
@@ -46,6 +55,25 @@ export default function CollegeAutocompleteInput({ questionId, onChange }) {
     }, 250);
   };
 
+  // NEW: Handle ArrowUp, ArrowDown, and Enter keys for keyboard navigation
+  const handleInputKeyDown = (e) => {
+    if (e.key === "ArrowDown") {
+      if (activeSuggestionIndex < suggestions.length - 1) {
+        setActiveSuggestionIndex(activeSuggestionIndex + 1);
+      }
+    } else if (e.key === "ArrowUp") {
+      if (activeSuggestionIndex > 0) {
+        setActiveSuggestionIndex(activeSuggestionIndex - 1);
+      }
+    } else if (e.key === "Enter") {
+      // If there's a valid active suggestion, select it
+      if (activeSuggestionIndex >= 0 && activeSuggestionIndex < suggestions.length) {
+        e.preventDefault(); // Prevent form submission if inside a form
+        handleSelect(suggestions[activeSuggestionIndex]);
+      }
+    }
+  };
+
   const handleSelect = (college) => {
     setQuery(college.name);
     setIsDropdownOpen(false);
@@ -60,6 +88,7 @@ export default function CollegeAutocompleteInput({ questionId, onChange }) {
         placeholder="Start typing your college or university..."
         value={query}
         onChange={handleInputChange}
+        onKeyDown={handleInputKeyDown} // NEW: Attach keyboard navigation
         className="border border-gray-300 rounded px-4 py-2 w-full"
       />
       {isDropdownOpen && suggestions.length > 0 && (
@@ -67,7 +96,9 @@ export default function CollegeAutocompleteInput({ questionId, onChange }) {
           {suggestions.map((college, idx) => (
             <li
               key={idx}
-              className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+              className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${
+                idx === activeSuggestionIndex ? "bg-gray-200" : ""
+              }`}
               onClick={() => handleSelect(college)}
             >
               {college.name} <span className="text-gray-400 text-sm">({college.country})</span>
