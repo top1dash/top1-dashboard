@@ -141,6 +141,7 @@ export default function Dashboard() {
                         age: userRankings[0]?.age || 'default',
                       }}
                       surveyName="divorce_risk"
+                      updatedAt={divorceData?.updated_at}
                       onUpdate={setFilteredDivorce}
                     />
                   </>
@@ -203,6 +204,7 @@ export default function Dashboard() {
                         age: userRankings[0]?.age || 'default',
                       }}
                       surveyName="physical_appearance_survey"
+                      updatedAt={appearanceData?.updated_at}
                       onUpdate={setFilteredAppearance}
                     />
                   </>
