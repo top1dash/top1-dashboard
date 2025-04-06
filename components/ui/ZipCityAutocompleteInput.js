@@ -6,8 +6,9 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [allLocations, setAllLocations] = useState([]);
+  const [countryOptions, setCountryOptions] = useState([]); // NEW state for drop-down options
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [countryName, setCountryName] = useState(""); // ✅ NEW state
+  const [countryName, setCountryName] = useState(""); // Existing state for current country
   const timeoutRef = useRef(null);
 
   // Step 1: IP-based country detection
@@ -17,7 +18,7 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
         const res = await fetch("https://ipapi.co/json");
         const data = await res.json();
         console.log("🌍 IP-based country:", data.country_name);
-        setCountryName(data.country_name); // ✅ Set full name like "United States"
+        setCountryName(data.country_name); // Set full name like "United States"
       } catch (err) {
         console.error("🌐 IP detection failed:", err);
         setCountryName("United States"); // Fallback
@@ -47,6 +48,15 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
     fetchZipCityData();
   }, []);
 
+  // NEW: Derive country options from loaded locations
+  useEffect(() => {
+    if (allLocations.length > 0) {
+      const uniqueCountries = [...new Set(allLocations.map((loc) => loc.country))];
+      uniqueCountries.sort();
+      setCountryOptions(uniqueCountries);
+    }
+  }, [allLocations]);
+
   // Step 3: Debounced input + fuzzy search
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -57,7 +67,7 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
     timeoutRef.current = setTimeout(() => {
       if (!value) return setSuggestions([]);
 
-      // ✅ Filter locations by country before fuzzy searching
+      // Filter locations by country before fuzzy searching
       const filteredByCountry = allLocations.filter(
         (loc) => loc.country === countryName
       );
@@ -69,7 +79,7 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
 
       const results = fuse.search(value).map((r) => r.item);
 
-      // ✅ Only show results that *start with* the typed query
+      // Only show results that *start with* the typed query
       const filteredResults = results.filter(
         (r) =>
           r.zip.toString().startsWith(value.toString()) ||
@@ -97,6 +107,23 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
 
   return (
     <div className="relative">
+      {/* NEW: Country drop-down for manual override */}
+      <div className="mb-2">
+        <label htmlFor="countrySelect" className="block mb-1">Country</label>
+        <select
+          id="countrySelect"
+          value={countryName}
+          onChange={(e) => setCountryName(e.target.value)}
+          className="border border-gray-300 rounded px-4 py-2 w-full"
+        >
+          {countryOptions.map((country, idx) => (
+            <option key={idx} value={country}>
+              {country}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <input
         type="text"
         placeholder="Start typing your ZIP code or city..."
