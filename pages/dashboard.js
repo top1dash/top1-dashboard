@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { supabase } from '../supabaseClient';
 import Modal from '../components/Modal';
 import FilteredRankCard from '../components/FilteredRankCard';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 import { ShieldCheck, BarChart2, Mail } from 'lucide-react';
 import Link from 'next/link';
 
@@ -16,9 +17,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [sessionEmail, setSessionEmail] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [filteredStates, setFilteredStates] = useState({});
-  const [surveyConfigs, setSurveyConfigs] = useState({});
-
+  const [filteredDivorce, setFilteredDivorce] = useState(null);
+  const [filteredAppearance, setFilteredAppearance] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -36,28 +36,20 @@ export default function Dashboard() {
       const userEmail = session.user.email;
       setSessionEmail(userEmail);
 
+      // Updated query: Order by updated_at descending so that the newest submission comes first
       const { data, error } = await supabase
         .from('rankings')
         .select('*')
         .eq('email', userEmail)
         .order('updated_at', { ascending: false });
 
+      console.log('🔍 Supabase returned user rankings:', data);
+      console.log('❗ Any Supabase error?', error);
+
       if (!error && data) {
         setUserRankings(data);
-      }
-
-      const { data: configData, error: configError } = await supabase
-        .from('survey_config')
-        .select('survey_name, higher_is_better');
-
-      if (configData) {
-        const configMap = {};
-        configData.forEach((item) => {
-          configMap[item.survey_name] = item.higher_is_better;
-        });
-        setSurveyConfigs(configMap);
       } else {
-        console.warn('Could not fetch survey configs:', configError);
+        console.warn('No user ranking data found or error occurred.');
       }
 
       setLoading(false);
@@ -84,16 +76,14 @@ export default function Dashboard() {
   const getRankingBySurvey = (slug) =>
     userRankings.find((r) => r.survey_name === slug);
 
-  const getAdjustedPercentile = (filtered, unfiltered, slug) => {
-    const raw = filtered ?? unfiltered;
-    if (raw == null) return null;
-    const invert = surveyConfigs[slug] === false;
-    return invert ? 1 - raw : raw;
-  };
+  const sortedSurveys = [...SURVEYS].sort((a, b) => {
+    const aTaken = getRankingBySurvey(a.slug) ? 0 : 1;
+    const bTaken = getRankingBySurvey(b.slug) ? 0 : 1;
+    return aTaken - bTaken;
+  });
 
-  const setFilteredForSlug = (slug, data) => {
-    setFilteredStates((prev) => ({ ...prev, [slug]: data }));
-  };
+  const divorceData = getRankingBySurvey('divorce_risk');
+  const appearanceData = getRankingBySurvey('physical_appearance_survey');
 
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4">
@@ -109,74 +99,127 @@ export default function Dashboard() {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {SURVEYS.map(({ slug, title }) => {
-                const ranking = getRankingBySurvey(slug);
-                const filtered = filteredStates[slug];
-                const adjustedPercentile = getAdjustedPercentile(filtered?.percentile, ranking?.percentile_rank, slug);
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold text-gray-700">Chance of Divorce</h2>
+                  <ShieldCheck className="w-5 h-5 text-blue-500" />
+                </div>
+                {divorceData ? (
+                  <>
+                    <p className="text-4xl font-bold text-blue-600">
+                      {(divorceData?.total_score * 100).toFixed(0)}%
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Top {((filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100).toFixed(0)}% of users
+                    </p>
+                  </>
+                ) : (
+                  <Link href="/survey/divorce_risk">
+                    <a className="text-blue-600 font-medium hover:underline">Take now!</a>
+                  </Link>
+                )}
+              </div>
 
-                return (
-                  <div key={slug} className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-                    <div className="flex items-center justify-between mb-3">
-                      <h2 className="text-lg font-semibold text-gray-700">{title}</h2>
-                      <ShieldCheck className="w-5 h-5 text-blue-500" />
-                    </div>
-                    {ranking ? (
-                      <>
-                        <p className="text-4xl font-bold text-blue-600">
-                          {(ranking.total_score * 100).toFixed(0)}%
-                        </p>
-                        <p className="text-sm text-gray-500 mt-1">
-                          Top {(adjustedPercentile * 100).toFixed(0)}% of users
-                        </p>
-                      </>
-                    ) : (
-                      <Link href={`/survey/${slug}`}>
-                        <a className="text-blue-600 font-medium hover:underline">Take now!</a>
-                      </Link>
-                    )}
-                  </div>
-                );
-              })}
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold text-gray-700">Percentile Rank</h2>
+                  <BarChart2 className="w-5 h-5 text-green-500" />
+                </div>
+                {divorceData ? (
+                  <>
+                    <p className="text-4xl font-bold text-green-600">
+                      {(filteredDivorce?.percentile ?? divorceData?.percentile_rank * 100).toFixed(0)}%
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Top {filteredDivorce?.rank ?? divorceData?.rank} among users
+                    </p>
+
+                    <FilteredRankCard
+                      user={{
+                      email: sessionEmail,
+                      gender: userRankings[0]?.gender || 'default',
+                      age: userRankings[0]?.age || 'default',
+                      zip: userRankings[0]?.zip || null,
+                      city: userRankings[0]?.city || null,
+                      state: userRankings[0]?.state || null,
+                      country: userRankings[0]?.country || null,
+                      school: userRankings[0]?.school || null,
+                    }}
+
+                      surveyName="divorce_risk"
+                      updatedAt={divorceData?.updated_at}
+                      onUpdate={setFilteredDivorce}
+                    />
+                  </>
+                ) : (
+                  <Link href="/survey/divorce_risk">
+                    <a className="text-blue-600 font-medium hover:underline">Take now!</a>
+                  </Link>
+                )}
+              </div>
+
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold text-gray-700">Email Linked</h2>
+                  <Mail className="w-5 h-5 text-gray-400" />
+                </div>
+                <p className="text-md font-medium text-gray-800 break-words">{sessionEmail}</p>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-              {SURVEYS.map(({ slug, title }) => {
-                const ranking = getRankingBySurvey(slug);
-                const filtered = filteredStates[slug];
-
-                return ranking ? (
-                  <div key={slug} className="rounded-2xl shadow-sm p-6 border border-gray-200 bg-white">
-                    <div className="flex items-center justify-between mb-3">
-                      <h2 className="text-lg font-semibold text-gray-700">{title} Percentile</h2>
-                      <BarChart2 className="w-5 h-5 text-green-500" />
-                    </div>
-                    <p className="text-4xl font-bold text-green-600">
-                      {(
-                        getAdjustedPercentile(filtered?.percentile, ranking?.percentile_rank, slug) * 100
-                      ).toFixed(0)}%
+              <div className="rounded-2xl shadow-sm p-6 border border-gray-200 bg-white">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold text-gray-700">Physical Appearance Score</h2>
+                  <BarChart2 className="w-5 h-5 text-indigo-500" />
+                </div>
+                {appearanceData ? (
+                  <>
+                    <p className="text-4xl font-bold text-blue-600">
+                      {appearanceData.total_score}
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      Top {filtered?.rank ?? ranking?.rank} among users
+                      Top {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}% of users
+                    </p>
+                  </>
+                ) : (
+                  <Link href="/survey/physical_appearance_survey">
+                    <a className="text-blue-600 font-medium hover:underline">Take now!</a>
+                  </Link>
+                )}
+              </div>
+
+              <div className="rounded-2xl shadow-sm p-6 border border-gray-200 bg-white">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold text-gray-700">Physical Percentile</h2>
+                  <BarChart2 className="w-5 h-5 text-indigo-500" />
+                </div>
+                {appearanceData ? (
+                  <>
+                    <p className="text-4xl font-bold text-green-600">
+                      {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}%
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Top {filteredAppearance?.rank || appearanceData?.rank} among users
                     </p>
 
                     <FilteredRankCard
                       user={{
                         email: sessionEmail,
-                        gender: ranking.gender || 'default',
-                        age: ranking.age || 'default',
-                        zip: ranking.zip || null,
-                        city: ranking.city || null,
-                        state: ranking.state || null,
-                        country: ranking.country || null,
-                        school: ranking.school || null,
+                        gender: userRankings[0]?.gender || 'default',
+                        age: userRankings[0]?.age || 'default',
                       }}
-                      surveyName={slug}
-                      updatedAt={ranking.updated_at}
-                      onUpdate={(data) => setFilteredForSlug(slug, data)}
+                      surveyName="physical_appearance_survey"
+                      updatedAt={appearanceData?.updated_at}
+                      onUpdate={setFilteredAppearance}
                     />
-                  </div>
-                ) : null;
-              })}
+                  </>
+                ) : (
+                  <Link href="/survey/physical_appearance_survey">
+                    <a className="text-blue-600 font-medium hover:underline">Take now!</a>
+                  </Link>
+                )}
+              </div>
             </div>
           </>
         )}
