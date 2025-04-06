@@ -110,7 +110,7 @@ export default function Dashboard() {
                       {(divorceData?.total_score * 100).toFixed(0)}%
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      Top {((filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100).toFixed(0)}% of users
+                      Top {(filteredDivorce?.percentile_rank * 100 || divorceData?.percentile_rank * 100).toFixed(0)}% of users
                     </p>
                   </>
                 ) : (
@@ -128,26 +128,19 @@ export default function Dashboard() {
                 {divorceData ? (
                   <>
                     <p className="text-4xl font-bold text-green-600">
-                      {(filteredDivorce?.percentile ?? divorceData?.percentile_rank * 100).toFixed(0)}%
+                      {(filteredDivorce?.percentile_rank * 100 || divorceData?.percentile_rank * 100).toFixed(0)}%
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      Top {filteredDivorce?.rank ?? divorceData?.rank} among users
+                      Top {filteredDivorce?.rank || divorceData?.rank} among users
                     </p>
 
                     <FilteredRankCard
                       user={{
-                      email: sessionEmail,
-                      gender: userRankings[0]?.gender || 'default',
-                      age: userRankings[0]?.age || 'default',
-                      zip: userRankings[0]?.zip || null,
-                      city: userRankings[0]?.city || null,
-                      state: userRankings[0]?.state || null,
-                      country: userRankings[0]?.country || null,
-                      school: userRankings[0]?.school || null,
-                    }}
-
+                        email: sessionEmail,
+                        gender: userRankings[0]?.gender || 'default',
+                        age: userRankings[0]?.age || 'default',
+                      }}
                       surveyName="divorce_risk"
-                      updatedAt={divorceData?.updated_at}
                       onUpdate={setFilteredDivorce}
                     />
                   </>
@@ -179,7 +172,7 @@ export default function Dashboard() {
                       {appearanceData.total_score}
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      Top {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}% of users
+                      Top {(filteredAppearance?.percentile_rank * 100 || appearanceData?.percentile_rank * 100).toFixed(0)}% of users
                     </p>
                   </>
                 ) : (
@@ -197,7 +190,7 @@ export default function Dashboard() {
                 {appearanceData ? (
                   <>
                     <p className="text-4xl font-bold text-green-600">
-                      {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}%
+                      {(filteredAppearance?.percentile_rank * 100 || appearanceData?.percentile_rank * 100).toFixed(0)}%
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
                       Top {filteredAppearance?.rank || appearanceData?.rank} among users
@@ -210,7 +203,6 @@ export default function Dashboard() {
                         age: userRankings[0]?.age || 'default',
                       }}
                       surveyName="physical_appearance_survey"
-                      updatedAt={appearanceData?.updated_at}
                       onUpdate={setFilteredAppearance}
                     />
                   </>
