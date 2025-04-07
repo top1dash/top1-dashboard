@@ -69,6 +69,8 @@ export default function FilteredRankCard({ user, surveyName, updatedAt, onUpdate
   const positionLabel = displayPercentile >= 50 ? 'top' : 'bottom';
   const groupLabel = activeFilter === 'all' ? 'all users' : user[activeFilter] ?? activeFilter;
   const genderLabel = user.gender?.toLowerCase() ?? 'all';
+  console.log("🔥 FilteredRankCard loaded with percentile:", percentile);
+
 
   return (
     <div className="mt-2 flex flex-col items-center">
