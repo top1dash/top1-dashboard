@@ -45,7 +45,13 @@ export default function FilteredRankCard({ user, surveyName, updatedAt, onUpdate
 
       if (response.ok) {
         console.log(`✅ Filtered result from Supabase:`, data);
-        onUpdate?.(activeFilter === 'all' ? null : data);
+        const fullPayload = {
+          ...data,
+          ...filters, // includes zip, city, state, etc.
+        };
+
+      onUpdate?.(activeFilter === 'all' ? null : fullPayload);
+
       } else {
         console.error('❌ Supabase function error:', data?.error || 'Unknown');
         onUpdate?.(null);
