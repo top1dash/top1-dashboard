@@ -132,11 +132,12 @@ export default function Dashboard() {
                     const displayPercent = Math.round(percentile * 100);
                     const gender = latestUserRanking.gender?.toLowerCase() ?? 'all';
             
+                    const filterFields = ['zip', 'city', 'state', 'country', 'school', 'age'];
                     const filterLabel = filteredDivorce
-                      ? Object.entries(filteredDivorce)
-                          .filter(([key, value]) => key !== 'percentile' && key !== 'rank' && value !== null)
-                          .map(([key, value]) => value)
-                          .join(', ')
+                      ? (() => {
+                          const found = filterFields.find((field) => filteredDivorce[field]);
+                          return found ? filteredDivorce[found] : 'all users';
+                        })()
                       : 'all users';
             
                     return (
