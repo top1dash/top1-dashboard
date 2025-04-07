@@ -112,35 +112,43 @@ export default function Dashboard() {
               {/* Divorce Percentile */}
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-semibold text-gray-700">Percentile Rank</h2>
+                {(() => {
+                  const percentile = (filteredDivorce?.percentile ?? divorceData?.percentile_rank) || 0;
+                  const displayPercent = Math.round(percentile * 100);
+                  const positionLabel = displayPercent >= 50 ? 'top' : 'bottom';
+                  return (
+                    <h2 className="text-lg font-semibold text-gray-700">
+                      You’re in the {positionLabel}:
+                    </h2>
+                  );
+                })()}
                 <BarChart2 className="w-5 h-5 text-green-500" />
               </div>
               {divorceData ? (
                 <>
-                  {/* Compute values inline */}
                   {(() => {
                     const percentile = (filteredDivorce?.percentile ?? divorceData?.percentile_rank) || 0;
                     const rank = filteredDivorce?.rank ?? divorceData?.rank;
                     const displayPercent = Math.round(percentile * 100);
-                    const positionLabel = displayPercent >= 50 ? 'top' : 'bottom';
+                    const gender = latestUserRanking.gender?.toLowerCase() ?? 'all';
+            
                     const filterLabel = filteredDivorce
                       ? Object.entries(filteredDivorce)
                           .filter(([key, value]) => key !== 'percentile' && key !== 'rank' && value !== null)
                           .map(([key, value]) => value)
                           .join(', ')
                       : 'all users';
-                    const gender = latestUserRanking.gender?.toLowerCase() ?? 'all';
             
                     return (
                       <>
                         <p className="text-4xl font-bold text-green-600">{displayPercent}%</p>
                         <p className="text-sm text-gray-500 mt-1">
-                          You’re in the {positionLabel} <br />
                           Among {gender} users in {filterLabel}
                         </p>
                       </>
                     );
                   })()}
+             
                     <FilteredRankCard
                       user={{
                         email: sessionEmail,
