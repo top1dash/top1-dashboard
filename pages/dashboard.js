@@ -118,7 +118,7 @@ export default function Dashboard() {
                 {divorceData ? (
                   <>
                     <p className="text-4xl font-bold text-green-600">
-                      {(filteredDivorce?.percentile ?? divorceData?.percentile_rank * 100).toFixed(0)}%
+                      {((filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100).toFixed(0)}%
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
                       Top {filteredDivorce?.rank ?? divorceData?.rank} among users
