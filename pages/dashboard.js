@@ -160,24 +160,35 @@ export default function Dashboard() {
 
               {/* Percentile Change */}
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-semibold text-gray-700">Change Since Last Login</h2>
-                  <BarChart2 className="w-5 h-5 text-yellow-500" />
-                </div>
-                {divorceData && userRankings.length > 1 && (
-                  (() => {
-                    const latest = filteredDivorce?.percentile ?? divorceData?.percentile_rank;
-                    const previous = userRankings.find(r => r.survey_name === 'divorce_risk' && r.id !== divorceData.id)?.percentile_rank;
-                    const change = latest && previous ? (latest - previous) * 100 : 0;
-                    const sign = change >= 0 ? '+' : '';
-                    return (
-                      <p className={`text-3xl font-bold ${change >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                {divorceData && userRankings.length > 1 && (() => {
+                  const latest = filteredDivorce?.percentile ?? divorceData?.percentile_rank;
+                  const previous = userRankings.find(
+                    r => r.survey_name === 'divorce_risk' && r.id !== divorceData.id
+                  )?.percentile_rank;
+                  const change = latest && previous ? (latest - previous) * 100 : 0;
+                  const sign = change >= 0 ? '+' : '';
+              
+                  const iconColor =
+                    change > 0
+                      ? 'text-green-600'
+                      : change < 0
+                      ? 'text-red-500'
+                      : 'text-gray-500';
+              
+                  return (
+                    <>
+                      <div className="flex items-center justify-between mb-3">
+                        <h2 className="text-lg font-semibold text-gray-700">Change Since Last Login</h2>
+                        <BarChart2 className={`w-5 h-5 ${iconColor}`} />
+                      </div>
+                      <p className={`text-3xl font-bold ${iconColor}`}>
                         {sign}{change.toFixed(1)}%
                       </p>
-                    );
-                  })()
-                )}
+                    </>
+                  );
+                })()}
               </div>
+
 
               {/* Chance of Divorce */}
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
