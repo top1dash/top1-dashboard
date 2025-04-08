@@ -115,7 +115,6 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
         e.preventDefault();
         setIsDropdownOpen(false);
         setActiveSuggestionIndex(-1);
-      }
 
     }
   };
