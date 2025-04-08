@@ -38,11 +38,22 @@ export default function CollegeAutocompleteInput({ questionId, onChange }) {
   includeScore: true,
 });
 
-    const results = query
-    ? fuse.search(query).sort((a, b) => a.score - b.score).map((r) => r.item)
-    : [];
+    if (!query) {
+  setSuggestions([]);
+  return;
+}
 
-  setSuggestions(results);
+const fuseResults = fuse.search(query).map((r) => r.item);
+
+const startsWithMatches = fuseResults.filter((item) =>
+  item.name.toLowerCase().startsWith(query.toLowerCase())
+);
+const otherMatches = fuseResults.filter(
+  (item) => !item.name.toLowerCase().startsWith(query.toLowerCase())
+);
+
+setSuggestions([...startsWithMatches, ...otherMatches].slice(0, 8));
+
 }, [query, allColleges]);
   
   const handleSelect = (college) => {
