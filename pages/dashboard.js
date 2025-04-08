@@ -208,7 +208,7 @@ export default function Dashboard() {
                 )}
               </div>
 
-            {/* Physical Appearance Section */}
+              {/* Physical Appearance Section */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
                 {/* Vertical Filter Panel */}
                 <div className="col-span-1">
