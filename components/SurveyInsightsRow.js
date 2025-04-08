@@ -3,8 +3,6 @@ import { supabase } from '../supabaseClient';
 import FilterChips from './FilterChips';
 import { BarChart2, ShieldCheck } from 'lucide-react';
 
-const formatTitle = (slug) =>
-  slug.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 const FILTER_OPTIONS = ['all', 'age', 'zip code', 'city', 'state', 'country', 'school'];
 
 export default function SurveyInsightsRow({ surveyName, title, user, userRankings }) {
