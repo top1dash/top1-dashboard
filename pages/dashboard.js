@@ -75,40 +75,36 @@ export default function Dashboard() {
   const appearanceData = getRankingBySurvey('physical_appearance_survey');
 
   const formatFilterLabel = (data) => {
-  if (!data) return `Among ${latestUserRanking.gender?.toLowerCase() || 'all'} users`;
+    if (!data) return `Among ${latestUserRanking.gender?.toLowerCase() || 'all'} users`;
 
-  const gender = data.gender?.toLowerCase() || 'all';
+    const gender = data.gender?.toLowerCase() || 'all';
+    const fields = ['zip', 'city', 'state', 'country', 'school', 'age'];
+    const found = fields.find((field) => data?.[field]);
 
-  const fields = ['zip', 'city', 'state', 'country', 'school', 'age'];
-  const found = fields.find((field) => data?.[field]);
+    if (!found) return `Among ${gender} users`;
 
-  if (!found) return `Among ${gender} users`;
+    const raw = data[found];
+    const value = typeof raw === 'object' && raw !== null ? Object.keys(raw)[0] : raw;
 
-  const raw = data[found];
-  const value = typeof raw === 'object' && raw !== null
-    ? Object.keys(raw)[0]
-    : raw;
+    let detail = '';
+    switch (found) {
+      case 'zip':
+      case 'city':
+      case 'state':
+      case 'country':
+        detail = `in ${value}`;
+        break;
+      case 'age':
+        detail = `between age ${value}`;
+        break;
+      case 'school':
+        detail = `at ${value}`;
+        break;
+    }
 
-  let detail = '';
+    return `Among ${gender} users ${detail}`;
+  };
 
-  switch (found) {
-    case 'zip':
-    case 'city':
-    case 'state':
-    case 'country':
-      detail = `in ${value}`;
-      break;
-    case 'age':
-      detail = `between age ${value}`;
-      break;
-    case 'school':
-      detail = `at ${value}`;
-      break;
-  }
-
-  return `Among ${gender} users ${detail}`;
-};
-  
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4">
       <Modal show={showModal} onClose={handleCloseModal} onStartSurvey={handleStartSurvey} />
@@ -122,60 +118,20 @@ export default function Dashboard() {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Divorce Stat */}
-              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-semibold text-gray-700">Chance of Divorce</h2>
-                  <ShieldCheck className="w-5 h-5 text-blue-500" />
-                </div>
-                {divorceData ? (
-                  <>
-                    <p className="text-4xl font-bold text-blue-600">
-                      {(divorceData?.total_score * 100).toFixed(0)}%
-                    </p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Top {((filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100).toFixed(0)}% of users
-                    </p>
-                  </>
-                ) : (
-                  <Link href="/survey/divorce_risk">
-                    <a className="text-blue-600 font-medium hover:underline">Take now!</a>
-                  </Link>
-                )}
-              </div>
-
               {/* Divorce Percentile */}
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-              <div className="flex items-center justify-between mb-3">
-                {(() => {
-                  const percentile = (filteredDivorce?.percentile ?? divorceData?.percentile_rank) || 0;
-                  const displayPercent = Math.round(percentile * 100);
-                  const positionLabel = displayPercent >= 50 ? 'top' : 'bottom';
-                  return (
-                    <h2 className="text-lg font-semibold text-gray-700">
-                      You’re in the {positionLabel}:
-                    </h2>
-                  );
-                })()}
-                <BarChart2 className="w-5 h-5 text-green-500" />
-              </div>
-              {divorceData ? (
-                <>
-                  {(() => {
-                    const percentile = (filteredDivorce?.percentile ?? divorceData?.percentile_rank) || 0;
-                    const rank = filteredDivorce?.rank ?? divorceData?.rank;
-                    const displayPercent = Math.round(percentile * 100);
-            
-                    return (
-                      <>
-                        <p className="text-4xl font-bold text-green-600">{displayPercent}%</p>
-                        <p className="text-sm text-gray-500 mt-1">
-                          {formatFilterLabel(filteredDivorce)}
-                        </p>
-                      </>
-                    );
-                  })()}
-             
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold text-gray-700">You’re in the {(filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100 >= 50 ? 'top' : 'bottom'}:</h2>
+                  <BarChart2 className="w-5 h-5 text-green-500" />
+                </div>
+                {divorceData && (
+                  <>
+                    <p className="text-4xl font-bold text-green-600">
+                      {Math.round((filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100)}%
+                    </p>
+                    <p className="text-sm text-gray-500 mb-2">
+                      {formatFilterLabel(filteredDivorce)}
+                    </p>
                     <FilteredRankCard
                       user={{
                         email: sessionEmail,
@@ -192,27 +148,57 @@ export default function Dashboard() {
                       onUpdate={setFilteredDivorce}
                     />
                   </>
-                ) : null}
+                )}
               </div>
 
-              {/* Email Card */}
+              {/* Percentile Change */}
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-semibold text-gray-700">Email Linked</h2>
-                  <Mail className="w-5 h-5 text-gray-400" />
+                  <h2 className="text-lg font-semibold text-gray-700">Change Since Last Login</h2>
+                  <BarChart2 className="w-5 h-5 text-yellow-500" />
                 </div>
-                <p className="text-md font-medium text-gray-800 break-words">{sessionEmail}</p>
+                {divorceData && userRankings.length > 1 && (
+                  <>
+                    {(() => {
+                      const latest = filteredDivorce?.percentile ?? divorceData?.percentile_rank;
+                      const previous = userRankings.find(r => r.survey_name === 'divorce_risk' && r.id !== divorceData.id)?.percentile_rank;
+                      const change = latest && previous ? (latest - previous) * 100 : 0;
+                      const sign = change >= 0 ? '+' : '';
+                      return (
+                        <p className={`text-3xl font-bold ${change >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                          {sign}{change.toFixed(1)}%
+                        </p>
+                      );
+                    })()}
+                  </>
+                )}
               </div>
-            </div>
 
-            {/* Appearance Survey */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-              <div className="rounded-2xl shadow-sm p-6 border border-gray-200 bg-white">
+              {/* Chance of Divorce */}
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold text-gray-700">Chance of Divorce</h2>
+                  <ShieldCheck className="w-5 h-5 text-blue-500" />
+                </div>
+                {divorceData && (
+                  <>
+                    <p className="text-4xl font-bold text-blue-600">
+                      {(divorceData?.total_score * 100).toFixed(0)}%
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Top {((filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100).toFixed(0)}% of users
+                    </p>
+                  </>
+                )}
+              </div>
+
+              {/* Physical Appearance Score */}
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-lg font-semibold text-gray-700">Physical Appearance Score</h2>
                   <BarChart2 className="w-5 h-5 text-indigo-500" />
                 </div>
-                {appearanceData ? (
+                {appearanceData && (
                   <>
                     <p className="text-4xl font-bold text-blue-600">
                       {appearanceData.total_score}
@@ -221,15 +207,16 @@ export default function Dashboard() {
                       Top {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}% of users
                     </p>
                   </>
-                ) : null}
+                )}
               </div>
 
-              <div className="rounded-2xl shadow-sm p-6 border border-gray-200 bg-white">
+              {/* Physical Percentile */}
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-lg font-semibold text-gray-700">Physical Percentile</h2>
                   <BarChart2 className="w-5 h-5 text-indigo-500" />
                 </div>
-                {appearanceData ? (
+                {appearanceData && (
                   <>
                     <p className="text-4xl font-bold text-green-600">
                       {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}%
@@ -248,15 +235,15 @@ export default function Dashboard() {
                       onUpdate={setFilteredAppearance}
                     />
                   </>
-                ) : null}
+                )}
               </div>
             </div>
+
+            <p className="text-sm text-gray-400 mt-10 text-center">
+              More personalized metrics coming soon...
+            </p>
           </>
         )}
-
-        <p className="text-sm text-gray-400 mt-10 text-center">
-          More personalized metrics coming soon...
-        </p>
       </div>
     </div>
   );
