@@ -1,107 +1,103 @@
-import { useEffect, useState, useRef } from "react";
-import { supabase } from "../../supabaseClient";
-import Fuse from "fuse.js";
+import React, { useState, useEffect, useRef } from 'react';
+import Fuse from 'fuse.js';
 
 export default function CollegeAutocompleteInput({ questionId, onChange }) {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [allColleges, setAllColleges] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-  // NEW: Track which suggestion is currently highlighted for keyboard navigation
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
 
+  const inputRef = useRef(null);
   const timeoutRef = useRef(null);
 
   useEffect(() => {
     const fetchColleges = async () => {
-      const { data, error } = await supabase
-        .from("survey_config")
-        .select("config")
-        .eq("survey_name", "colleges_global_cleaned")
-        .single();
-
-      if (data?.config) {
-        setAllColleges(data.config);
-      } else {
-        console.error("Error loading colleges:", error);
+      try {
+        const response = await fetch(
+          'https://hwafvupabcnhialqqgxy.supabase.co/storage/v1/object/public/top1-global/colleges_global_cleaned.json'
+        );
+        const data = await response.json();
+        setAllColleges(data);
+      } catch (error) {
+        console.error('Error loading colleges from Supabase Storage:', error);
       }
     };
 
     fetchColleges();
   }, []);
 
-  // NEW: Reset active suggestion index whenever the suggestions list changes
   useEffect(() => {
+    const fuse = new Fuse(allColleges, {
+      keys: ['name'],
+      threshold: 0.3,
+    });
+
+    const results = query ? fuse.search(query).map((r) => r.item) : [];
+    setSuggestions(results);
+  }, [query, allColleges]);
+
+  const handleSelect = (college) => {
+    setQuery(college.name);
+    setIsDropdownOpen(false);
     setActiveSuggestionIndex(-1);
-  }, [suggestions]);
-
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    setQuery(value);
-    setIsDropdownOpen(true);
-
-    clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      if (!value) return setSuggestions([]);
-
-      const fuse = new Fuse(allColleges, {
-        keys: ["name"],
-        threshold: 0.3,
-      });
-
-      const results = fuse.search(value).map((r) => r.item);
-      setSuggestions(results.slice(0, 8));
-    }, 250);
+    onChange({ questionId, value: college.name });
   };
 
-  // NEW: Handle ArrowUp, ArrowDown, and Enter keys for keyboard navigation
-  const handleInputKeyDown = (e) => {
-    if (e.key === "ArrowDown") {
-      if (activeSuggestionIndex < suggestions.length - 1) {
-        setActiveSuggestionIndex(activeSuggestionIndex + 1);
-      }
-    } else if (e.key === "ArrowUp") {
-      if (activeSuggestionIndex > 0) {
-        setActiveSuggestionIndex(activeSuggestionIndex - 1);
-      }
-    } else if (e.key === "Enter") {
-      // If there's a valid active suggestion, select it
-      if (activeSuggestionIndex >= 0 && activeSuggestionIndex < suggestions.length) {
-        e.preventDefault(); // Prevent form submission if inside a form
+  const handleKeyDown = (e) => {
+    if (!isDropdownOpen) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveSuggestionIndex((prev) =>
+        Math.min(prev + 1, suggestions.length - 1)
+      );
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveSuggestionIndex((prev) => Math.max(prev - 1, 0));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (activeSuggestionIndex >= 0 && suggestions[activeSuggestionIndex]) {
         handleSelect(suggestions[activeSuggestionIndex]);
       }
     }
   };
 
-  const handleSelect = (college) => {
-    setQuery(college.name);
-    setIsDropdownOpen(false);
-    setSuggestions([]);
-    onChange(questionId, college.name);
+  const handleBlur = () => {
+    timeoutRef.current = setTimeout(() => {
+      setIsDropdownOpen(false);
+    }, 100);
+  };
+
+  const handleFocus = () => {
+    clearTimeout(timeoutRef.current);
+    setIsDropdownOpen(true);
   };
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <input
         type="text"
-        placeholder="Start typing your college or university..."
+        ref={inputRef}
+        className="border p-2 rounded w-full"
+        placeholder="Search your college"
         value={query}
-        onChange={handleInputChange}
-        onKeyDown={handleInputKeyDown} // NEW: Attach keyboard navigation
-        className="border border-gray-300 rounded px-4 py-2 w-full"
+        onChange={(e) => setQuery(e.target.value)}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
       />
       {isDropdownOpen && suggestions.length > 0 && (
-        <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded mt-1 shadow">
-          {suggestions.map((college, idx) => (
+        <ul className="absolute z-10 bg-white border w-full mt-1 rounded shadow max-h-48 overflow-y-auto">
+          {suggestions.map((college, index) => (
             <li
-              key={idx}
-              className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${
-                idx === activeSuggestionIndex ? "bg-gray-200" : ""
+              key={college.name}
+              className={`px-4 py-2 cursor-pointer ${
+                index === activeSuggestionIndex ? 'bg-gray-100' : ''
               }`}
-              onClick={() => handleSelect(college)}
+              onMouseDown={() => handleSelect(college)}
             >
-              {college.name} <span className="text-gray-400 text-sm">({college.country})</span>
+              {college.name}
             </li>
           ))}
         </ul>
