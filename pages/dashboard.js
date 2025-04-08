@@ -75,7 +75,7 @@ export default function Dashboard() {
   const appearanceData = getRankingBySurvey('physical_appearance_survey');
 
   const formatFilterLabel = (data) => {
-  if (!data) return '';
+  if (!data) return `Among ${latestUserRanking.gender?.toLowerCase() || 'all'} users`;
 
   const gender = data.gender?.toLowerCase() || 'all';
 
