@@ -13,23 +13,20 @@ export default function CollegeAutocompleteInput({ questionId, onChange }) {
   const timeoutRef = useRef(null);
 
   useEffect(() => {
-    const fetchColleges = async () => {
+  const fetchColleges = async () => {
       const url = `https://hwafvupabcnhialqqgxy.supabase.co/storage/v1/object/public/public-data//colleges_global_clean.json.gz`;
       try {
-        const response = await fetch(url);
-        const buffer = await response.arrayBuffer();
-        console.log("📦 Downloaded byte length:", buffer.byteLength);
-        const decompressed = inflate(new Uint8Array(buffer), { to: "string" });
-        const json = JSON.parse(decompressed);
-        console.log(`✅ Loaded ${json.length} entries from College DB`);
-        setAllColleges(json);
-      } catch (error) {
-        console.error("❌ Error loading colleges from Supabase storage:", error);
-      }
-    };
+      const response = await fetch(url);
+      const json = await response.json();
+      console.log(`✅ Loaded ${json.length} colleges`);
+      setAllColleges(json);
+    } catch (error) {
+      console.error("❌ Failed to load colleges:", error);
+    }
+  };
 
-    fetchColleges();
-  }, []);
+  fetchColleges();
+}, []);
   
   useEffect(() => {
     const fuse = new Fuse(allColleges, {
