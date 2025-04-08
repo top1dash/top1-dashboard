@@ -16,7 +16,6 @@ export default function CollegeAutocompleteInput({ questionId, onChange }) {
       try {
         const response = await fetch(
           `https://hwafvupabcnhialqqgxy.supabase.co/storage/v1/object/public/public-data/college_global_cleaned.json.gz`;
-        );
         const data = await response.json();
         setAllColleges(data);
       } catch (error) {
