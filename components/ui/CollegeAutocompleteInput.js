@@ -31,7 +31,7 @@ export default function CollegeAutocompleteInput({ questionId, onChange }) {
   useEffect(() => {
     const fuse = new Fuse(allColleges, {
   keys: ['name'],
-  threshold: 0.2,
+  threshold: 0.1,
   ignoreLocation: true,
   minMatchCharLength: 2,
   shouldSort: true,
