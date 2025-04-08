@@ -29,32 +29,18 @@ export default function CollegeAutocompleteInput({ questionId, onChange }) {
 }, []);
   
   useEffect(() => {
-    const fuse = new Fuse(allColleges, {
-  keys: ['name'],
-  threshold: 0.1,
-  ignoreLocation: true,
-  minMatchCharLength: 2,
-  shouldSort: true,
-  includeScore: true,
-});
+  if (!query) {
+    setSuggestions([]);
+    return;
+  }
 
-    if (!query) {
-  setSuggestions([]);
-  return;
-}
+  const results = allColleges.filter((college) =>
+    college.name.toLowerCase().startsWith(query.toLowerCase())
+  );
 
-const fuseResults = fuse.search(query).map((r) => r.item);
-
-const startsWithMatches = fuseResults.filter((item) =>
-  item.name.toLowerCase().startsWith(query.toLowerCase())
-);
-const otherMatches = fuseResults.filter(
-  (item) => !item.name.toLowerCase().startsWith(query.toLowerCase())
-);
-
-setSuggestions([...startsWithMatches, ...otherMatches].slice(0, 8));
-
+  setSuggestions(results);
 }, [query, allColleges]);
+
   
   const handleSelect = (college) => {
     setQuery(college.name);
