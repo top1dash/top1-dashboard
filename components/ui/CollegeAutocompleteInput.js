@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Fuse from 'fuse.js';
-import pako from 'pako';
+import { inflate } from 'pako';
 
 export default function CollegeAutocompleteInput({ questionId, onChange }) {
   const [query, setQuery] = useState('');
@@ -13,22 +13,24 @@ export default function CollegeAutocompleteInput({ questionId, onChange }) {
   const timeoutRef = useRef(null);
 
   useEffect(() => {
-  const fetchColleges = async () => {
-    try {
-      const response = await fetch(
-        'https://hwafvupabcnhialqqgxy.supabase.co/storage/v1/object/public/public-data/college_global_cleaned.json.gz'
-      );
-      const buffer = await response.arrayBuffer();
-      const decompressed = pako.ungzip(new Uint8Array(buffer), { to: 'string' });
-      const json = JSON.parse(decompressed);
-      setAllColleges(json.colleges_global_cleaned || []);
-    } catch (error) {
-      console.error('Error loading colleges from Supabase Storage:', error);
-    }
-  };
-  fetchColleges();
-}, []);
+    const fetchColleges = async () => {
+      const url = `https://hwafvupabcnhialqqgxy.supabase.co/storage/v1/object/public/public-data/college_global_cleaned.json.gz`;
 
+      try {
+        const response = await fetch(url);
+        const buffer = await response.arrayBuffer();
+        const decompressed = inflate(new Uint8Array(buffer), { to: "string" });
+        const json = JSON.parse(decompressed);
+        console.log(`✅ Loaded ${json.length} entries from College DB`);
+        setAllColleges(json);
+      } catch (error) {
+        console.error("❌ Error loading colleges from Supabase storage:", error);
+      }
+    };
+
+    fetchColleges();
+  }, []);
+  
   useEffect(() => {
     const fuse = new Fuse(allColleges, {
       keys: ['name'],
