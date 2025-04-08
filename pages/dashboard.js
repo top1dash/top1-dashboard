@@ -116,12 +116,34 @@ export default function Dashboard() {
         {loading ? (
           <p className="text-gray-500">Loading your data...</p>
         ) : (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {/* Vertical Filter Panel */}
+            <div className="col-span-1">
+              <FilteredRankCard
+                user={{
+                  email: sessionEmail,
+                  gender: latestUserRanking.gender || 'default',
+                  age: latestUserRanking.age || 'default',
+                  zip: latestUserRanking.zip || null,
+                  city: latestUserRanking.city || null,
+                  state: latestUserRanking.state || null,
+                  country: latestUserRanking.country || null,
+                  school: latestUserRanking.school || null,
+                }}
+                surveyName="divorce_risk"
+                updatedAt={divorceData?.updated_at}
+                onUpdate={setFilteredDivorce}
+              />
+            </div>
+
+            {/* Tiles */}
+            <div className="col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Divorce Percentile */}
               <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-semibold text-gray-700">You’re in the {(filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100 >= 50 ? 'top' : 'bottom'}:</h2>
+                  <h2 className="text-lg font-semibold text-gray-700">
+                    You’re in the {(filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100 >= 50 ? 'top' : 'bottom'}:
+                  </h2>
                   <BarChart2 className="w-5 h-5 text-green-500" />
                 </div>
                 {divorceData && (
@@ -132,21 +154,6 @@ export default function Dashboard() {
                     <p className="text-sm text-gray-500 mb-2">
                       {formatFilterLabel(filteredDivorce)}
                     </p>
-                    <FilteredRankCard
-                      user={{
-                        email: sessionEmail,
-                        gender: latestUserRanking.gender || 'default',
-                        age: latestUserRanking.age || 'default',
-                        zip: latestUserRanking.zip || null,
-                        city: latestUserRanking.city || null,
-                        state: latestUserRanking.state || null,
-                        country: latestUserRanking.country || null,
-                        school: latestUserRanking.school || null,
-                      }}
-                      surveyName="divorce_risk"
-                      updatedAt={divorceData?.updated_at}
-                      onUpdate={setFilteredDivorce}
-                    />
                   </>
                 )}
               </div>
@@ -158,19 +165,17 @@ export default function Dashboard() {
                   <BarChart2 className="w-5 h-5 text-yellow-500" />
                 </div>
                 {divorceData && userRankings.length > 1 && (
-                  <>
-                    {(() => {
-                      const latest = filteredDivorce?.percentile ?? divorceData?.percentile_rank;
-                      const previous = userRankings.find(r => r.survey_name === 'divorce_risk' && r.id !== divorceData.id)?.percentile_rank;
-                      const change = latest && previous ? (latest - previous) * 100 : 0;
-                      const sign = change >= 0 ? '+' : '';
-                      return (
-                        <p className={`text-3xl font-bold ${change >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                          {sign}{change.toFixed(1)}%
-                        </p>
-                      );
-                    })()}
-                  </>
+                  (() => {
+                    const latest = filteredDivorce?.percentile ?? divorceData?.percentile_rank;
+                    const previous = userRankings.find(r => r.survey_name === 'divorce_risk' && r.id !== divorceData.id)?.percentile_rank;
+                    const change = latest && previous ? (latest - previous) * 100 : 0;
+                    const sign = change >= 0 ? '+' : '';
+                    return (
+                      <p className={`text-3xl font-bold ${change >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                        {sign}{change.toFixed(1)}%
+                      </p>
+                    );
+                  })()
                 )}
               </div>
 
@@ -193,56 +198,53 @@ export default function Dashboard() {
               </div>
 
               {/* Physical Appearance Score */}
-              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-semibold text-gray-700">Physical Appearance Score</h2>
-                  <BarChart2 className="w-5 h-5 text-indigo-500" />
+              <div className="col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+                <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-lg font-semibold text-gray-700">Physical Appearance Score</h2>
+                    <BarChart2 className="w-5 h-5 text-indigo-500" />
+                  </div>
+                  {appearanceData && (
+                    <>
+                      <p className="text-4xl font-bold text-blue-600">
+                        {appearanceData.total_score}
+                      </p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Top {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}% of users
+                      </p>
+                    </>
+                  )}
                 </div>
-                {appearanceData && (
-                  <>
-                    <p className="text-4xl font-bold text-blue-600">
-                      {appearanceData.total_score}
-                    </p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Top {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}% of users
-                    </p>
-                  </>
-                )}
-              </div>
 
-              {/* Physical Percentile */}
-              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-semibold text-gray-700">Physical Percentile</h2>
-                  <BarChart2 className="w-5 h-5 text-indigo-500" />
+                <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-lg font-semibold text-gray-700">Physical Percentile</h2>
+                    <BarChart2 className="w-5 h-5 text-indigo-500" />
+                  </div>
+                  {appearanceData && (
+                    <>
+                      <p className="text-4xl font-bold text-green-600">
+                        {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}%
+                      </p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Top {filteredAppearance?.rank || appearanceData?.rank} among users
+                      </p>
+                      <FilteredRankCard
+                        user={{
+                          email: sessionEmail,
+                          gender: latestUserRanking.gender || 'default',
+                          age: latestUserRanking.age || 'default',
+                        }}
+                        surveyName="physical_appearance_survey"
+                        updatedAt={appearanceData?.updated_at}
+                        onUpdate={setFilteredAppearance}
+                      />
+                    </>
+                  )}
                 </div>
-                {appearanceData && (
-                  <>
-                    <p className="text-4xl font-bold text-green-600">
-                      {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}%
-                    </p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Top {filteredAppearance?.rank || appearanceData?.rank} among users
-                    </p>
-                    <FilteredRankCard
-                      user={{
-                        email: sessionEmail,
-                        gender: latestUserRanking.gender || 'default',
-                        age: latestUserRanking.age || 'default',
-                      }}
-                      surveyName="physical_appearance_survey"
-                      updatedAt={appearanceData?.updated_at}
-                      onUpdate={setFilteredAppearance}
-                    />
-                  </>
-                )}
               </div>
             </div>
-
-            <p className="text-sm text-gray-400 mt-10 text-center">
-              More personalized metrics coming soon...
-            </p>
-          </>
+          </div>
         )}
       </div>
     </div>
