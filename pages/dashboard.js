@@ -171,7 +171,7 @@ export default function Dashboard() {
                     const change = latest && previous ? (latest - previous) * 100 : 0;
                     const sign = change >= 0 ? '+' : '';
                     return (
-                      <p className={`text-3xl font-bold ${change >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                      <p className={`text-3xl font-bold ${change >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                         {sign}{change.toFixed(1)}%
                       </p>
                     );
