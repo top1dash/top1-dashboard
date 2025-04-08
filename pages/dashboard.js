@@ -116,194 +116,181 @@ export default function Dashboard() {
         {loading ? (
           <p className="text-gray-500">Loading your data...</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {/* Vertical Filter Panel */}
-            <div className="col-span-1">
-              <FilteredRankCard
-                user={{
-                  email: sessionEmail,
-                  gender: latestUserRanking.gender || 'default',
-                  age: latestUserRanking.age || 'default',
-                  zip: latestUserRanking.zip || null,
-                  city: latestUserRanking.city || null,
-                  state: latestUserRanking.state || null,
-                  country: latestUserRanking.country || null,
-                  school: latestUserRanking.school || null,
-                }}
-                surveyName="divorce_risk"
-                updatedAt={divorceData?.updated_at}
-                onUpdate={setFilteredDivorce}
-              />
-            </div>
-
-            {/* Tiles */}
-            <div className="col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Divorce Percentile */}
-              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-semibold text-gray-700">
-                    You’re in the {(filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100 >= 50 ? 'top' : 'bottom'}:
-                  </h2>
-                  <BarChart2 className="w-5 h-5 text-emerald-500" />
-                </div>
-                {divorceData && (
-                  <>
-                    <p className="text-4xl font-bold text-emerald-600">
-                      {Math.round((filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100)}%
-                    </p>
-                    <p className="text-sm text-gray-500 mb-2">
-                      {formatFilterLabel(filteredDivorce)}
-                    </p>
-                  </>
-                )}
+          <>
+            {/* === Divorce Survey Row === */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="col-span-1">
+                <FilteredRankCard
+                  user={{
+                    email: sessionEmail,
+                    gender: latestUserRanking.gender || 'default',
+                    age: latestUserRanking.age || 'default',
+                    zip: latestUserRanking.zip || null,
+                    city: latestUserRanking.city || null,
+                    state: latestUserRanking.state || null,
+                    country: latestUserRanking.country || null,
+                    school: latestUserRanking.school || null,
+                  }}
+                  surveyName="divorce_risk"
+                  updatedAt={divorceData?.updated_at}
+                  onUpdate={setFilteredDivorce}
+                />
               </div>
 
-              {/* Percentile Change */}
-              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-                {divorceData && userRankings.length > 1 && (() => {
-                  const latest = filteredDivorce?.percentile ?? divorceData?.percentile_rank;
-                  const previous = userRankings.find(
-                    r => r.survey_name === 'divorce_risk' && r.id !== divorceData.id
-                  )?.percentile_rank;
-                  const change = latest && previous ? (latest - previous) * 100 : 0;
-                  const sign = change >= 0 ? '+' : '';
-              
-                  const iconColor =
-                    change > 0
-                      ? 'text-emerald-600'
-                      : change < 0
-                      ? 'text-red-500'
-                      : 'text-gray-500';
-              
-                  return (
+              <div className="col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Percentile Tile */}
+                <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-lg font-semibold text-gray-700">
+                      You’re in the {(filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100 >= 50 ? 'top' : 'bottom'}:
+                    </h2>
+                    <BarChart2 className="w-5 h-5 text-emerald-500" />
+                  </div>
+                  {divorceData && (
                     <>
-                      <div className="flex items-center justify-between mb-3">
-                        <h2 className="text-lg font-semibold text-gray-700">Change Since Last Login</h2>
-                        <BarChart2 className={`w-5 h-5 ${iconColor}`} />
-                      </div>
+                      <p className="text-4xl font-bold text-emerald-600">
+                        {Math.round((filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100)}%
+                      </p>
+                      <p className="text-sm text-gray-500 mb-2">
+                        {formatFilterLabel(filteredDivorce)}
+                      </p>
+                    </>
+                  )}
+                </div>
+
+                {/* Change Tile */}
+                <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                  {divorceData && userRankings.length > 1 && (() => {
+                    const latest = filteredDivorce?.percentile ?? divorceData?.percentile_rank;
+                    const previous = userRankings.find(
+                      r => r.survey_name === 'divorce_risk' && r.id !== divorceData.id
+                    )?.percentile_rank;
+                    const change = latest && previous ? (latest - previous) * 100 : 0;
+                    const sign = change >= 0 ? '+' : '';
+                    const iconColor =
+                      change > 0 ? 'text-emerald-600' :
+                      change < 0 ? 'text-red-500' :
+                      'text-gray-500';
+
+                    return (
+                      <>
+                        <div className="flex items-center justify-between mb-3">
+                          <h2 className="text-lg font-semibold text-gray-700">Change Since Last Login</h2>
+                          <BarChart2 className={`w-5 h-5 ${iconColor}`} />
+                        </div>
+                        <p className={`text-3xl font-bold ${iconColor}`}>
+                          {sign}{change.toFixed(1)}%
+                        </p>
+                      </>
+                    );
+                  })()}
+                </div>
+
+                {/* Score Tile */}
+                <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-lg font-semibold text-gray-700">Chance of Divorce</h2>
+                    <ShieldCheck className="w-5 h-5 text-blue-500" />
+                  </div>
+                  {divorceData && (
+                    <>
+                      <p className="text-4xl font-bold text-blue-600">
+                        {(divorceData?.total_score * 100).toFixed(0)}%
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Top {((filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100).toFixed(0)}% of users
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* === Physical Appearance Survey Row === */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-10">
+              <div className="col-span-1">
+                <FilteredRankCard
+                  user={{
+                    email: sessionEmail,
+                    gender: latestUserRanking.gender || 'default',
+                    age: latestUserRanking.age || 'default',
+                    zip: latestUserRanking.zip || null,
+                    city: latestUserRanking.city || null,
+                    state: latestUserRanking.state || null,
+                    country: latestUserRanking.country || null,
+                    school: latestUserRanking.school || null,
+                  }}
+                  surveyName="physical_appearance_survey"
+                  updatedAt={appearanceData?.updated_at}
+                  onUpdate={setFilteredAppearance}
+                />
+              </div>
+
+              <div className="col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Percentile Tile */}
+                <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-lg font-semibold text-gray-700">Physical Percentile</h2>
+                    <BarChart2 className="w-5 h-5 text-purple-500" />
+                  </div>
+                  {appearanceData && (
+                    <>
+                      <p className="text-4xl font-bold text-green-600">
+                        {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}%
+                      </p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Top {filteredAppearance?.rank || appearanceData?.rank} among users
+                      </p>
+                    </>
+                  )}
+                </div>
+
+                {/* Change Tile */}
+                <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-lg font-semibold text-gray-700">Change Since Last Login</h2>
+                    <BarChart2 className="w-5 h-5 text-gray-400" />
+                  </div>
+                  {appearanceData && userRankings.length > 1 && (() => {
+                    const latest = filteredAppearance?.percentile ?? appearanceData?.percentile_rank;
+                    const previous = userRankings.find(r =>
+                      r.survey_name === 'physical_appearance_survey' && r.id !== appearanceData.id
+                    )?.percentile_rank;
+                    const change = latest && previous ? (latest - previous) * 100 : 0;
+                    const sign = change >= 0 ? '+' : '';
+                    const iconColor =
+                      change > 0 ? 'text-emerald-600' :
+                      change < 0 ? 'text-red-500' :
+                      'text-gray-500';
+
+                    return (
                       <p className={`text-3xl font-bold ${iconColor}`}>
                         {sign}{change.toFixed(1)}%
                       </p>
+                    );
+                  })()}
+                </div>
+
+                {/* Score Tile */}
+                <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-lg font-semibold text-gray-700">Physical Appearance Score</h2>
+                    <BarChart2 className="w-5 h-5 text-indigo-500" />
+                  </div>
+                  {appearanceData && (
+                    <>
+                      <p className="text-4xl font-bold text-blue-600">
+                        {appearanceData.total_score}
+                      </p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Top {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}% of users
+                      </p>
                     </>
-                  );
-                })()}
-              </div>
-
-
-              {/* Chance of Divorce */}
-              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-semibold text-gray-700">Chance of Divorce</h2>
-                  <ShieldCheck className="w-5 h-5 text-blue-500" />
+                  )}
                 </div>
-                {divorceData && (
-                  <>
-                    <p className="text-4xl font-bold text-blue-600">
-                      {(divorceData?.total_score * 100).toFixed(0)}%
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Top {((filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100).toFixed(0)}% of users
-                    </p>
-                  </>
-                )}
               </div>
             </div>
-
-          </div> {/* END of first md:grid-cols-4 (divorce row) */}
-        </div> {/* END of Divorce Row */}
-
-
-          {/* Second Survey Row – Physical Appearance */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-10">
-            {/* Filter Panel */}
-            <div className="col-span-1">
-              <FilteredRankCard
-                user={{
-                  email: sessionEmail,
-                  gender: latestUserRanking.gender || 'default',
-                  age: latestUserRanking.age || 'default',
-                  zip: latestUserRanking.zip || null,
-                  city: latestUserRanking.city || null,
-                  state: latestUserRanking.state || null,
-                  country: latestUserRanking.country || null,
-                  school: latestUserRanking.school || null,
-                }}
-                surveyName="physical_appearance_survey"
-                updatedAt={appearanceData?.updated_at}
-                onUpdate={setFilteredAppearance}
-              />
-            </div>
-
-            {/* Physical Appearance Tiles */}
-            <div className="col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Physical Percentile */}
-              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-semibold text-gray-700">Physical Percentile</h2>
-                  <BarChart2 className="w-5 h-5 text-purple-500" />
-                </div>
-                {appearanceData && (
-                  <>
-                    <p className="text-4xl font-bold text-green-600">
-                      {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}%
-                    </p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Top {filteredAppearance?.rank || appearanceData?.rank} among users
-                    </p>
-                  </>
-                )}
-              </div>
-
-              {/* Change Since Last Login */}
-              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-semibold text-gray-700">Change Since Last Login</h2>
-                  <BarChart2 className="w-5 h-5 text-gray-400" />
-                </div>
-                {appearanceData && userRankings.length > 1 && (() => {
-                  const latest = filteredAppearance?.percentile ?? appearanceData?.percentile_rank;
-                  const previous = userRankings.find(r =>
-                    r.survey_name === 'physical_appearance_survey' && r.id !== appearanceData.id
-                  )?.percentile_rank;
-                  const change = latest && previous ? (latest - previous) * 100 : 0;
-                  const sign = change >= 0 ? '+' : '';
-                  const iconColor =
-                    change > 0
-                      ? 'text-emerald-600'
-                      : change < 0
-                      ? 'text-red-500'
-                      : 'text-gray-500';
-
-                  return (
-                    <p className={`text-3xl font-bold ${iconColor}`}>
-                      {sign}{change.toFixed(1)}%
-                    </p>
-                  );
-                })()}
-              </div>
-
-              {/* Physical Appearance Score */}
-              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-semibold text-gray-700">Physical Appearance Score</h2>
-                  <BarChart2 className="w-5 h-5 text-indigo-500" />
-                </div>
-                {appearanceData && (
-                  <>
-                    <p className="text-4xl font-bold text-blue-600">
-                      {appearanceData.total_score}
-                    </p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Top {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}% of users
-                    </p>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-
-        
-          </div>
+          </>
         )}
       </div>
     </div>
