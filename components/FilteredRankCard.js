@@ -74,12 +74,6 @@ export default function FilteredRankCard({ user, surveyName, updatedAt, onUpdate
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}
       />
-
-      {updatedAt && (
-        <p className="text-sm text-gray-400 mt-2">
-          Last updated: {new Date(updatedAt).toLocaleDateString()}
-        </p>
-      )}
     </div>
   );
 }
