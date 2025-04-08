@@ -41,7 +41,9 @@ export default function Dashboard() {
       // Map configs to include title from JSON config
       const mappedConfigs = (configs || []).map((s) => ({
         survey_name: s.survey_name,
-        title: s.config?.title || s.survey_name,
+        title: s.survey_name
+          .replace(/_/g, ' ')
+          .replace(/\b\w/g, (char) => char.toUpperCase()),
       }));
 
       setUserRankings(rankings || []);
