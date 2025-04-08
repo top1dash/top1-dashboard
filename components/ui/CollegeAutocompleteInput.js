@@ -60,7 +60,7 @@ setSuggestions([...startsWithMatches, ...otherMatches].slice(0, 8));
     setQuery(college.name);
     setIsDropdownOpen(false);
     setActiveSuggestionIndex(-1);
-    onChange({ questionId, college.name });
+    onChange( questionId, college.name );
   };
 
   const handleKeyDown = (e) => {
