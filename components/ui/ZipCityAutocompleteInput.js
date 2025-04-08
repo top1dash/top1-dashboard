@@ -24,7 +24,6 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
         console.error("🌐 IP detection failed:", err);
         setCountryName("United States"); // Fallback
       }
-    }
     };
 
     detectCountry();
@@ -112,35 +111,11 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
         e.preventDefault(); // prevent form submission
         handleSelect(suggestions[activeSuggestionIndex]);
       }
+     } else if (e.key === "Escape") {
+        e.preventDefault();
+        setIsDropdownOpen(false);
         setActiveSuggestionIndex(-1);
-    onChange({ questionId, value: college.name });
-  };
-
-  const handleKeyDown = (e) => {
-    if (!isDropdownOpen) return;
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setActiveSuggestionIndex((prev) =>
-        Math.min(prev + 1, suggestions.length - 1)
-      );
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setActiveSuggestionIndex((prev) => Math.max(prev - 1, 0));
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      if (activeSuggestionIndex >= 0 && suggestions[activeSuggestionIndex]) {
-        handleSelect(suggestions[activeSuggestionIndex]);
       }
-    } else if (e.key === "Escape") {
-      e.preventDefault();
-      setIsDropdownOpen(false);
-      setActiveSuggestionIndex(-1);
-    }
-  };
-
-  const handleBlur = () => {
-    timeoutRef.current = setTimeout(() => {
 
     }
   };
