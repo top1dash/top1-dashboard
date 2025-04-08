@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import FilterChips from './FilterChips';
 
-const FILTER_OPTIONS = ['all', 'age', 'zip/postal_code', 'city', 'state', 'country', 'school'];
+const FILTER_OPTIONS = ['all', 'age', 'zip code', 'city', 'state', 'country', 'school'];
 
 export default function FilteredRankCard({ user, surveyName, updatedAt, onUpdate }) {
   const [activeFilter, setActiveFilter] = useState('all');
@@ -20,7 +20,7 @@ export default function FilteredRankCard({ user, surveyName, updatedAt, onUpdate
         survey_name: surveyName,
         gender: user.gender, // always included
         age: activeFilter === 'age' ? user.age : null,
-        zip: activeFilter === 'zip/postal_code' ? user.zip : null,
+        zip: activeFilter === 'zip code' ? user.zip : null,
         city: activeFilter === 'city' ? user.city : null,
         state: activeFilter === 'state' ? user.state : null,
         country: activeFilter === 'country' ? user.country : null,
