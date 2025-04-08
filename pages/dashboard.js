@@ -74,6 +74,41 @@ export default function Dashboard() {
   const divorceData = getRankingBySurvey('divorce_risk');
   const appearanceData = getRankingBySurvey('physical_appearance_survey');
 
+  const formatFilterLabel = (data) => {
+  if (!data) return '';
+
+  const gender = data.gender?.toLowerCase() || 'all';
+
+  const fields = ['zip', 'city', 'state', 'country', 'school', 'age'];
+  const found = fields.find((field) => data?.[field]);
+
+  if (!found) return `Among ${gender} users`;
+
+  const raw = data[found];
+  const value = typeof raw === 'object' && raw !== null
+    ? Object.keys(raw)[0]
+    : raw;
+
+  let detail = '';
+
+  switch (found) {
+    case 'zip':
+    case 'city':
+    case 'state':
+    case 'country':
+      detail = `in ${value}`;
+      break;
+    case 'age':
+      detail = `between age ${value}`;
+      break;
+    case 'school':
+      detail = `at ${value}`;
+      break;
+  }
+
+  return `Among ${gender} users ${detail}`;
+};
+  
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4">
       <Modal show={showModal} onClose={handleCloseModal} onStartSurvey={handleStartSurvey} />
@@ -130,21 +165,12 @@ export default function Dashboard() {
                     const percentile = (filteredDivorce?.percentile ?? divorceData?.percentile_rank) || 0;
                     const rank = filteredDivorce?.rank ?? divorceData?.rank;
                     const displayPercent = Math.round(percentile * 100);
-                    const gender = latestUserRanking.gender?.toLowerCase() ?? 'all';
-            
-                    const filterFields = ['zip', 'city', 'state', 'country', 'school', 'age'];
-                    const filterLabel = filteredDivorce
-                      ? (() => {
-                          const found = filterFields.find((field) => filteredDivorce[field]);
-                          return found ? filteredDivorce[found] : 'all users';
-                        })()
-                      : 'all users';
             
                     return (
                       <>
                         <p className="text-4xl font-bold text-green-600">{displayPercent}%</p>
                         <p className="text-sm text-gray-500 mt-1">
-                          Among {gender} users in {filterLabel}
+                          {formatFilterLabel(filteredDivorce)}
                         </p>
                       </>
                     );
