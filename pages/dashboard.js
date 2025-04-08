@@ -34,12 +34,18 @@ export default function Dashboard() {
           .order('updated_at', { ascending: false }),
         supabase
           .from('survey_config')
-          .select('survey_name, title')
+          .select('survey_name, config')
           .order('survey_name'),
       ]);
 
+      // Map configs to include title from JSON config
+      const mappedConfigs = (configs || []).map((s) => ({
+        survey_name: s.survey_name,
+        title: s.config?.title || s.survey_name,
+      }));
+
       setUserRankings(rankings || []);
-      setSurveyConfigs(configs || []);
+      setSurveyConfigs(mappedConfigs);
       setLoading(false);
 
       const hasSeenModal = localStorage.getItem('hasSeenWelcomeModal');
