@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Fuse from 'fuse.js';
-import { inflate } from 'pako';
+import { gunzip } from 'pako';
 
 export default function CollegeAutocompleteInput({ questionId, onChange }) {
   const [query, setQuery] = useState('');
@@ -19,7 +19,7 @@ export default function CollegeAutocompleteInput({ questionId, onChange }) {
         const response = await fetch(url);
         const buffer = await response.arrayBuffer();
         console.log("📦 Downloaded byte length:", buffer.byteLength);
-        const decompressed = inflate(new Uint8Array(buffer), { to: "string" });
+        const decompressed = gunzip(new Uint8Array(buffer), { to: "string" });
         const json = JSON.parse(decompressed);
         console.log(`✅ Loaded ${json.length} entries from College DB`);
         setAllColleges(json);
