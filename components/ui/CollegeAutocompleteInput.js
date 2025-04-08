@@ -79,7 +79,12 @@ setSuggestions([...startsWithMatches, ...otherMatches].slice(0, 8));
       if (activeSuggestionIndex >= 0 && suggestions[activeSuggestionIndex]) {
         handleSelect(suggestions[activeSuggestionIndex]);
       }
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      setIsDropdownOpen(false);
+      setActiveSuggestionIndex(-1);
     }
+
   };
 
   const handleBlur = () => {
