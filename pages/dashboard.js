@@ -210,6 +210,8 @@ export default function Dashboard() {
             </div>
 
           </div> {/* END of first md:grid-cols-4 (divorce row) */}
+        </div> {/* END of Divorce Row */}
+
 
           {/* Second Survey Row – Physical Appearance */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-10">
