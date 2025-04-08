@@ -68,7 +68,7 @@ export default function FilteredRankCard({ user, surveyName, updatedAt, onUpdate
   }, [activeFilter, surveyName]);
 
   return (
-    <div className="mt-2 flex flex-col items-center">
+    <div className="mt-2 w-full flex flex-col">
       <FilterChips
         options={FILTER_OPTIONS}
         activeFilter={activeFilter}
