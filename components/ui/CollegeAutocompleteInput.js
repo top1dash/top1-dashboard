@@ -18,6 +18,7 @@ export default function CollegeAutocompleteInput({ questionId, onChange }) {
       try {
         const response = await fetch(url);
         const buffer = await response.arrayBuffer();
+        console.log("📦 Downloaded byte length:", buffer.byteLength);
         const decompressed = inflate(new Uint8Array(buffer), { to: "string" });
         const json = JSON.parse(decompressed);
         console.log(`✅ Loaded ${json.length} entries from College DB`);
