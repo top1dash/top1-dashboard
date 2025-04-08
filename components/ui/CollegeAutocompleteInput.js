@@ -30,14 +30,21 @@ export default function CollegeAutocompleteInput({ questionId, onChange }) {
   
   useEffect(() => {
     const fuse = new Fuse(allColleges, {
-      keys: ['name'],
-      threshold: 0.3,
-    });
+  keys: ['name'],
+  threshold: 0.3,
+  ignoreLocation: true,
+  minMatchCharLength: 2,
+  shouldSort: true,
+  includeScore: true,
+});
 
-    const results = query ? fuse.search(query).map((r) => r.item) : [];
-    setSuggestions(results);
-  }, [query, allColleges]);
+    const results = query
+    ? fuse.search(query).sort((a, b) => a.score - b.score).map((r) => r.item)
+    : [];
 
+  setSuggestions(results);
+}, [query, allColleges]);
+  
   const handleSelect = (college) => {
     setQuery(college.name);
     setIsDropdownOpen(false);
