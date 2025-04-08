@@ -21,7 +21,7 @@ export default function CollegeAutocompleteInput({ questionId, onChange }) {
       const buffer = await response.arrayBuffer();
       const decompressed = pako.ungzip(new Uint8Array(buffer), { to: 'string' });
       const json = JSON.parse(decompressed);
-      setAllColleges(json);
+      setAllColleges(json.colleges_global_cleaned || []);
     } catch (error) {
       console.error('Error loading colleges from Supabase Storage:', error);
     }
