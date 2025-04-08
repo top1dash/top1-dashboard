@@ -3,14 +3,72 @@ import { supabase } from '../supabaseClient';
 import FilterChips from './FilterChips';
 import { BarChart2, ShieldCheck } from 'lucide-react';
 
+const FILTER_OPTIONS = ['all', 'age', 'zip code', 'city', 'state', 'country', 'school'];
+
 export default function SurveyInsightsRow({ surveyName, title, user, userRankings }) {
+  const [activeFilter, setActiveFilter] = useState('all');
   const [filtered, setFiltered] = useState(null);
   const [ranking, setRanking] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const found = userRankings.find((r) => r.survey_name === surveyName);
     setRanking(found);
   }, [userRankings, surveyName]);
+
+  const fetchRank = async () => {
+    setLoading(true);
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const filters = {
+        email: user.email,
+        survey_name: surveyName,
+        gender: user.gender,
+        age: activeFilter === 'age' ? user.age : null,
+        zip: activeFilter === 'zip code' ? user.zip : null,
+        city: activeFilter === 'city' ? user.city : null,
+        state: activeFilter === 'state' ? user.state : null,
+        country: activeFilter === 'country' ? user.country : null,
+        school: activeFilter === 'school' ? user.school : null,
+      };
+
+      const response = await fetch(
+        'https://hwafvupabcnhialqqgxy.supabase.co/functions/v1/get-filtered-rank',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify(filters),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        const fullPayload = {
+          ...data,
+          ...filters,
+        };
+        setFiltered(activeFilter === 'all' ? null : fullPayload);
+      } else {
+        console.error('❌ Supabase function error:', data?.error || 'Unknown');
+        setFiltered(null);
+      }
+    } catch (error) {
+      console.error('❌ Fetch error:', error);
+      setFiltered(null);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchRank();
+  }, [activeFilter, surveyName]);
 
   const formatFilterLabel = (data) => {
     const gender = data?.gender?.toLowerCase() || 'all';
@@ -42,20 +100,19 @@ export default function SurveyInsightsRow({ surveyName, title, user, userRanking
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-10">
-      {/* Filter column */}
+      {/* Filter Panel */}
       <div className="col-span-1">
         <div className="bg-white shadow-sm rounded-xl p-4 border border-gray-200">
           <h3 className="text-lg font-semibold mb-2">{title} Filters</h3>
           <FilterChips
-            user={user}
-            surveyName={surveyName}
-            updatedAt={ranking?.updated_at}
-            onUpdate={setFiltered}
+            options={FILTER_OPTIONS}
+            activeFilter={activeFilter}
+            onFilterChange={setActiveFilter}
           />
         </div>
       </div>
 
-      {/* 3 Tile Column */}
+      {/* Tiles */}
       <div className="col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Percentile */}
         <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
