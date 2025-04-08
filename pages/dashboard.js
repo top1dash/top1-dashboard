@@ -148,7 +148,7 @@ export default function Dashboard() {
                 </div>
                 {divorceData && (
                   <>
-                    <p className="text-4xl font-bold text-green-600">
+                    <p className="text-4xl font-bold text-emerald-600">
                       {Math.round((filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100)}%
                     </p>
                     <p className="text-sm text-gray-500 mb-2">
