@@ -78,7 +78,6 @@ export default function Dashboard() {
     if (!data) return `Among ${latestUserRanking.gender?.toLowerCase() || 'all'} users`;
 
     const gender = data.gender?.toLowerCase() || 'all';
-
     const fields = ['zip', 'city', 'state', 'country', 'school', 'age'];
     const found = fields.find((field) => data?.[field]);
 
@@ -88,7 +87,6 @@ export default function Dashboard() {
     const value = typeof raw === 'object' && raw !== null ? Object.keys(raw)[0] : raw;
 
     let detail = '';
-
     switch (found) {
       case 'zip':
       case 'city':
@@ -120,39 +118,27 @@ export default function Dashboard() {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Divorce Insights */}
-              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200 col-span-1 sm:col-span-2 lg:col-span-2">
+              {/* Divorce Insights Combined Tile */}
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200 col-span-1 sm:col-span-2">
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-lg font-semibold text-gray-700">Divorce Insights</h2>
                   <ShieldCheck className="w-5 h-5 text-blue-500" />
                 </div>
-
-                {divorceData ? (
+                {divorceData && (
                   <>
                     <p className="text-4xl font-bold text-blue-600">
                       {(divorceData?.total_score * 100).toFixed(0)}%
                     </p>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-500">
                       Top {((filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100).toFixed(0)}% of users
                     </p>
-
-                    <div className="mt-4">
-                      {(() => {
-                        const percentile = (filteredDivorce?.percentile ?? divorceData?.percentile_rank) || 0;
-                        const displayPercent = Math.round(percentile * 100);
-                        const positionLabel = displayPercent >= 50 ? 'top' : 'bottom';
-                        return (
-                          <>
-                            <h3 className="text-md font-semibold text-gray-700 mb-1">
-                              You’re in the {positionLabel}:
-                            </h3>
-                            <p className="text-2xl font-bold text-green-600">{displayPercent}%</p>
-                            <p className="text-sm text-gray-500 mt-1">{formatFilterLabel(filteredDivorce)}</p>
-                          </>
-                        );
-                      })()}
-                    </div>
-
+                    <h3 className="mt-4 font-medium text-gray-600">You’re in the {((filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100).toFixed(0) >= 50 ? 'top' : 'bottom'}:</h3>
+                    <p className="text-3xl font-bold text-green-600">
+                      {Math.round((filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100)}%
+                    </p>
+                    <p className="text-sm text-gray-500 mb-2">
+                      {formatFilterLabel(filteredDivorce)}
+                    </p>
                     <FilteredRankCard
                       user={{
                         email: sessionEmail,
@@ -169,10 +155,6 @@ export default function Dashboard() {
                       onUpdate={setFilteredDivorce}
                     />
                   </>
-                ) : (
-                  <Link href="/survey/divorce_risk">
-                    <a className="text-blue-600 font-medium hover:underline">Take now!</a>
-                  </Link>
                 )}
               </div>
 
@@ -183,6 +165,53 @@ export default function Dashboard() {
                   <Mail className="w-5 h-5 text-gray-400" />
                 </div>
                 <p className="text-md font-medium text-gray-800 break-words">{sessionEmail}</p>
+              </div>
+            </div>
+
+            {/* Appearance Survey */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+              <div className="rounded-2xl shadow-sm p-6 border border-gray-200 bg-white">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold text-gray-700">Physical Appearance Score</h2>
+                  <BarChart2 className="w-5 h-5 text-indigo-500" />
+                </div>
+                {appearanceData ? (
+                  <>
+                    <p className="text-4xl font-bold text-blue-600">
+                      {appearanceData.total_score}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Top {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}% of users
+                    </p>
+                  </>
+                ) : null}
+              </div>
+
+              <div className="rounded-2xl shadow-sm p-6 border border-gray-200 bg-white">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold text-gray-700">Physical Percentile</h2>
+                  <BarChart2 className="w-5 h-5 text-indigo-500" />
+                </div>
+                {appearanceData ? (
+                  <>
+                    <p className="text-4xl font-bold text-green-600">
+                      {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}%
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Top {filteredAppearance?.rank || appearanceData?.rank} among users
+                    </p>
+                    <FilteredRankCard
+                      user={{
+                        email: sessionEmail,
+                        gender: latestUserRanking.gender || 'default',
+                        age: latestUserRanking.age || 'default',
+                      }}
+                      surveyName="physical_appearance_survey"
+                      updatedAt={appearanceData?.updated_at}
+                      onUpdate={setFilteredAppearance}
+                    />
+                  </>
+                ) : null}
               </div>
             </div>
           </>
