@@ -14,7 +14,7 @@ export default function CollegeAutocompleteInput({ questionId, onChange }) {
 
   useEffect(() => {
   const fetchColleges = async () => {
-      const url = `https://hwafvupabcnhialqqgxy.supabase.co/storage/v1/object/public/public-data//colleges_global_clean.json.gz`;
+      const url = `https://hwafvupabcnhialqqgxy.supabase.co/storage/v1/object/public/public-data//colleges_global_clean.json`;
       try {
       const response = await fetch(url);
       const json = await response.json();
