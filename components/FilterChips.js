@@ -1,6 +1,6 @@
 export default function FilterChips({ options, activeFilter, onFilterChange }) {
   return (
-    <div className="flex flex-col space-y-2 justify-center">
+    <div className="flex grid-cols-2 gap-2 justify-center">
       {options.map((option) => (
         <button
           key={option}
