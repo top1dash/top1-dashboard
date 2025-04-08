@@ -144,7 +144,7 @@ export default function Dashboard() {
                   <h2 className="text-lg font-semibold text-gray-700">
                     You’re in the {(filteredDivorce?.percentile ?? divorceData?.percentile_rank) * 100 >= 50 ? 'top' : 'bottom'}:
                   </h2>
-                  <BarChart2 className="w-5 h-5 text-green-500" />
+                  <BarChart2 className="w-5 h-5 text-emerald-500" />
                 </div>
                 {divorceData && (
                   <>
