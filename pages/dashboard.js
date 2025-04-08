@@ -170,7 +170,7 @@ export default function Dashboard() {
               
                   const iconColor =
                     change > 0
-                      ? 'text-green-600'
+                      ? 'text-emerald-600'
                       : change < 0
                       ? 'text-red-500'
                       : 'text-gray-500';
