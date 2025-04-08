@@ -208,53 +208,84 @@ export default function Dashboard() {
                 )}
               </div>
 
-              {/* Physical Appearance Score */}
-              <div className="col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-                <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-                  <div className="flex items-center justify-between mb-3">
-                    <h2 className="text-lg font-semibold text-gray-700">Physical Appearance Score</h2>
-                    <BarChart2 className="w-5 h-5 text-indigo-500" />
-                  </div>
-                  {appearanceData && (
-                    <>
-                      <p className="text-4xl font-bold text-blue-600">
-                        {appearanceData.total_score}
-                      </p>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Top {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}% of users
-                      </p>
-                    </>
-                  )}
+             {/* Physical Appearance Section */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
+                {/* Vertical Filter Panel */}
+                <div className="col-span-1">
+                  <FilteredRankCard
+                    user={{
+                      email: sessionEmail,
+                      gender: latestUserRanking.gender || 'default',
+                      age: latestUserRanking.age || 'default',
+                    }}
+                    surveyName="physical_appearance_survey"
+                    updatedAt={appearanceData?.updated_at}
+                    onUpdate={setFilteredAppearance}
+                    orientation="vertical"
+                  />
                 </div>
-
-                <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-                  <div className="flex items-center justify-between mb-3">
-                    <h2 className="text-lg font-semibold text-gray-700">Physical Percentile</h2>
-                    <BarChart2 className="w-5 h-5 text-indigo-500" />
+              
+                {/* Physical Tiles */}
+                <div className="col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {/* Physical Percentile */}
+                  <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                    <div className="flex items-center justify-between mb-3">
+                      <h2 className="text-lg font-semibold text-gray-700">Physical Percentile</h2>
+                      <BarChart2 className="w-5 h-5 text-purple-500" />
+                    </div>
+                    {appearanceData && (
+                      <>
+                        <p className="text-4xl font-bold text-green-600">
+                          {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}%
+                        </p>
+                        <p className="text-sm text-gray-500 mt-1">
+                          Top {filteredAppearance?.rank || appearanceData?.rank} among users
+                        </p>
+                      </>
+                    )}
                   </div>
-                  {appearanceData && (
-                    <>
-                      <p className="text-4xl font-bold text-green-600">
-                        {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}%
-                      </p>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Top {filteredAppearance?.rank || appearanceData?.rank} among users
-                      </p>
-                      <FilteredRankCard
-                        user={{
-                          email: sessionEmail,
-                          gender: latestUserRanking.gender || 'default',
-                          age: latestUserRanking.age || 'default',
-                        }}
-                        surveyName="physical_appearance_survey"
-                        updatedAt={appearanceData?.updated_at}
-                        onUpdate={setFilteredAppearance}
-                      />
-                    </>
-                  )}
+              
+                  {/* Appearance Percentile Change */}
+                  <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                    <div className="flex items-center justify-between mb-3">
+                      <h2 className="text-lg font-semibold text-gray-700">Change Since Last Login</h2>
+                      <BarChart2 className="w-5 h-5 text-gray-400" />
+                    </div>
+                    {appearanceData && userRankings.length > 1 && (
+                      (() => {
+                        const latest = filteredAppearance?.percentile ?? appearanceData?.percentile_rank;
+                        const previous = userRankings.find(r => r.survey_name === 'physical_appearance_survey' && r.id !== appearanceData.id)?.percentile_rank;
+                        const change = latest && previous ? (latest - previous) * 100 : 0;
+                        const sign = change >= 0 ? '+' : '';
+                        return (
+                          <p className={`text-3xl font-bold ${change >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                            {sign}{change.toFixed(1)}%
+                          </p>
+                        );
+                      })()
+                    )}
+                  </div>
+              
+                  {/* Physical Appearance Score */}
+                  <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+                    <div className="flex items-center justify-between mb-3">
+                      <h2 className="text-lg font-semibold text-gray-700">Physical Appearance Score</h2>
+                      <BarChart2 className="w-5 h-5 text-indigo-500" />
+                    </div>
+                    {appearanceData && (
+                      <>
+                        <p className="text-4xl font-bold text-blue-600">
+                          {appearanceData.total_score}
+                        </p>
+                        <p className="text-sm text-gray-500 mt-1">
+                          Top {(filteredAppearance?.percentile ?? appearanceData?.percentile_rank * 100).toFixed(0)}% of users
+                        </p>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+
           </div>
         )}
       </div>
