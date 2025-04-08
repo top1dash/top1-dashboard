@@ -34,6 +34,8 @@ export default function SurveyInsightsRow({ surveyName, title, user, userRanking
         country: activeFilter === 'country' ? user.country : null,
         school: activeFilter === 'school' ? user.school : null,
       };
+      console.log(`📡 Fetching filtered rank for:`, filters);
+
 
       const response = await fetch(
         'https://hwafvupabcnhialqqgxy.supabase.co/functions/v1/get-filtered-rank',
@@ -50,6 +52,7 @@ export default function SurveyInsightsRow({ surveyName, title, user, userRanking
       const data = await response.json();
 
       if (response.ok) {
+        console.log(`✅ Filtered result from Supabase:`, data);
         const fullPayload = {
           ...data,
           ...filters,
