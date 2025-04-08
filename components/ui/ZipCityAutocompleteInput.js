@@ -24,6 +24,7 @@ export default function ZipCityAutocompleteInput({ questionId, onChange }) {
         console.error("🌐 IP detection failed:", err);
         setCountryName("United States"); // Fallback
       }
+    }
     };
 
     detectCountry();
