@@ -126,7 +126,7 @@ export default function SurveyInsightsRow({ surveyName, title, user, userRanking
           {ranking && (
             <>
               <p className="text-4xl font-bold text-emerald-600">
-                {(filtered?.percentile ?? ranking?.percentile_rank * 100).toFixed(0)}%
+                {((filtered?.percentile ?? ranking?.percentile_rank) * 100).toFixed(0)}%
               </p>
               <p className="text-sm text-gray-500 mt-1">
                 {formatFilterLabel(filtered)}
@@ -160,7 +160,6 @@ export default function SurveyInsightsRow({ surveyName, title, user, userRanking
             );
           })()}
         </div>
-
         {/* Score */}
         <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
           <div className="flex items-center justify-between mb-3">
@@ -173,7 +172,7 @@ export default function SurveyInsightsRow({ surveyName, title, user, userRanking
                 {(ranking?.total_score * 100).toFixed(0)}%
               </p>
               <p className="text-sm text-gray-500">
-                Top {(filtered?.percentile ?? ranking?.percentile_rank * 100).toFixed(0)}% of users
+                Top {((filtered?.percentile ?? ranking?.percentile_rank) * 100).toFixed(0)}%
               </p>
             </>
           )}
