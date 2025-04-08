@@ -209,7 +209,26 @@ export default function Dashboard() {
               </div>
             </div>
 
-          {
+          {/* Second Survey Row – Physical Appearance */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-10">
+          {/* Filter Panel */}
+          <div className="col-span-1">
+            <FilteredRankCard
+              user={{
+                email: sessionEmail,
+                gender: latestUserRanking.gender || 'default',
+                age: latestUserRanking.age || 'default',
+                zip: latestUserRanking.zip || null,
+                city: latestUserRanking.city || null,
+                state: latestUserRanking.state || null,
+                country: latestUserRanking.country || null,
+                school: latestUserRanking.school || null,
+              }}
+              surveyName="physical_appearance_survey"
+              updatedAt={appearanceData?.updated_at}
+              onUpdate={setFilteredAppearance}
+            />
+          </div>
         
           {/* Physical Appearance Tiles */}
           <div className="col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
