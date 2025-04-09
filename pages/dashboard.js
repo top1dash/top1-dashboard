@@ -73,7 +73,7 @@ export default function Dashboard() {
   const latestUser = userRankings?.[0] || {};
 
   return (
-    <>
+    <div className="min-h-screen bg-gray-100 py-10 px-4">
       <Modal
         show={showModal}
         onClose={handleCloseModal}
