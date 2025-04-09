@@ -121,9 +121,14 @@ export default function SurveyInsightsRow({ surveyName, title, user, userRanking
         {/* Percentile */}
         <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-gray-700">{title} Percentile</h2>
-            <BarChart2 className="w-5 h-5 text-emerald-500" />
-          </div>
+          <h2 className="text-lg font-semibold text-gray-700">
+            {(() => {
+              const percentile = ((filtered?.percentile ?? ranking?.percentile_rank) * 100).toFixed(0);
+              return parseFloat(percentile) >= 50 ? "You're in the top" : "You're in the bottom";
+            })()}
+          </h2>
+          <BarChart2 className="w-5 h-5 text-emerald-500" />
+        </div>
           {ranking && (
               <>
                 {/* Determine percentile number */}
