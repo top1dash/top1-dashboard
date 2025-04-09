@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export default function SurveysIndex() {
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+    <>
       <div className="bg-white shadow rounded-xl p-8 max-w-md w-full text-center">
         <h1 className="text-2xl font-bold mb-6">Choose a Survey</h1>
 
@@ -19,6 +19,6 @@ export default function SurveysIndex() {
           </a>
         </Link>
       </div>
-    </div>
+    </>
   );
 }
