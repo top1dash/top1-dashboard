@@ -132,7 +132,7 @@ export default function SurveyInsightsRow({ surveyName, title, user, userRanking
             
                   return (
                     <>
-                      <p className="text-sm font-medium text-gray-500 mb-1">
+                      <p className={`text-sm font-medium mb-1 ${isTop ? 'text-gray-500' : 'text-red-500'}`}>
                         {isTop ? "You're in the top" : "You're in the bottom"}
                       </p>
                       <p className="text-4xl font-bold text-emerald-600">{percentile}%</p>
