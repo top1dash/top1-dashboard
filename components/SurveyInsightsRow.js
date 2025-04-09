@@ -190,5 +190,6 @@ export default function SurveyInsightsRow({ surveyName, title, user, userRanking
         </div>
       </div>
     </div>
+  </>
   );
 }
