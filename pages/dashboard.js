@@ -1,10 +1,3 @@
-
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import { supabase } from '../supabaseClient';
-import Modal from '../components/Modal';
-import SurveyInsightsRow from '../components/SurveyInsightsRow';
-
 export default function Dashboard() {
   const [sessionEmail, setSessionEmail] = useState(null);
   const [userRankings, setUserRankings] = useState([]);
@@ -106,7 +99,7 @@ export default function Dashboard() {
             />
           ))
         )}
-    </div>
-  <>
+      </div>
+    </>
   );
 }
