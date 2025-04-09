@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../supabaseClient';
+import Layout from '../components/Layout'
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -124,3 +125,6 @@ export default function Login() {
     </div>
   );
 }
+Login.getLayout = function PageLayout(page) {
+  return <Layout noBackground>{page}</Layout>;
+};
