@@ -120,7 +120,7 @@ export default function SurveyInsightsRow({ surveyName, title, user, userRanking
       {/* Tiles */}
       <div className="col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Percentile */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between mb-3">
             <div>
               <h2 className="text-lg font-semibold text-gray-700">Your Rank</h2>
@@ -153,7 +153,7 @@ export default function SurveyInsightsRow({ surveyName, title, user, userRanking
         </div>
 
         {/* Change Since Last Login */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-semibold text-gray-700">Rank Change</h2>
             <BarChart2 className="w-5 h-5 text-gray-400" />
@@ -178,7 +178,7 @@ export default function SurveyInsightsRow({ surveyName, title, user, userRanking
           })()}
         </div>
         {/* Score */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-semibold text-gray-700">Your Score</h2>
             <ShieldCheck className="w-5 h-5 text-blue-500" />
