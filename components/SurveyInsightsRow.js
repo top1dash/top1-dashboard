@@ -175,7 +175,7 @@ export default function SurveyInsightsRow({ surveyName, title, user, userRanking
         {/* Score */}
         <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-gray-700">Total {title}</h2>
+            <h2 className="text-lg font-semibold text-gray-700">Your {title}</h2>
             <ShieldCheck className="w-5 h-5 text-blue-500" />
           </div>
           {ranking && (
