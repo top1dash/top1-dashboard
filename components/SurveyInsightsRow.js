@@ -108,7 +108,6 @@ export default function SurveyInsightsRow({ surveyName, title, user, userRanking
       {/* Filter Panel */}
       <div className="col-span-1">
         <div className="bg-white shadow-sm rounded-xl p-4 border border-gray-200">
-          <h3 className="text-lg font-semibold mb-2">{title} Filters</h3>
           <FilterChips
             options={FILTER_OPTIONS}
             activeFilter={activeFilter}
