@@ -124,15 +124,24 @@ export default function SurveyInsightsRow({ surveyName, title, user, userRanking
             <BarChart2 className="w-5 h-5 text-emerald-500" />
           </div>
           {ranking && (
-            <>
-              <p className="text-4xl font-bold text-emerald-600">
-                {((filtered?.percentile ?? ranking?.percentile_rank) * 100).toFixed(0)}%
-              </p>
-              <p className="text-sm text-gray-500 mt-1">
-                {formatFilterLabel(filtered)}
-              </p>
-            </>
-          )}
+              <>
+                {/* Determine percentile number */}
+                {(() => {
+                  const percentile = ((filtered?.percentile ?? ranking?.percentile_rank) * 100).toFixed(0);
+                  const isTop = parseFloat(percentile) >= 50;
+            
+                  return (
+                    <>
+                      <p className="text-sm font-medium text-gray-500 mb-1">
+                        {isTop ? "You're in the top" : "You're in the bottom"}
+                      </p>
+                      <p className="text-4xl font-bold text-emerald-600">{percentile}%</p>
+                      <p className="text-sm text-gray-500 mt-1">{formatFilterLabel(filtered)}</p>
+                    </>
+                  );
+                })()}
+              </>
+            )}
         </div>
 
         {/* Change Since Last Login */}
