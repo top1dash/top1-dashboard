@@ -124,7 +124,7 @@ export default function SurveyInsightsRow({ surveyName, title, user, userRanking
           <h2 className="text-lg font-semibold text-gray-700">
             {(() => {
               const percentile = ((filtered?.percentile ?? ranking?.percentile_rank) * 100).toFixed(0);
-              return parseFloat(percentile) >= 50 ? "You're in the top" : "You're in the bottom";
+              return parseFloat(percentile) >= 50 ? "You're in the Top" : "You're in the Bottom";
             })()}
           </h2>
           <BarChart2 className="w-5 h-5 text-emerald-500" />
@@ -138,9 +138,6 @@ export default function SurveyInsightsRow({ surveyName, title, user, userRanking
             
                   return (
                     <>
-                      <p className="text-sm font-medium text-gray-500 mb-1">
-                        {isTop ? "You're in the top" : "You're in the bottom"}
-                      </p>
                       <p className="text-4xl font-bold text-emerald-600">{percentile}%</p>
                       <p className="text-sm text-gray-500 mt-1">{formatFilterLabel(filtered)}</p>
                     </>
