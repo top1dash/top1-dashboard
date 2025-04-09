@@ -3,7 +3,7 @@ import Navbar from './Navbar'
 
 export default function Layout({ children }) {
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 bg-[url('/top1%.png')] dark:bg-none bg-top bg-no-repeat bg-cover text-gray-900 dark:text-white">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 bg-[url('/top1percent.png')] dark:bg-none bg-top bg-no-repeat bg-cover text-gray-900 dark:text-white">
       <Navbar />
       <main className="w-full px-4 py-8">
         {children}
