@@ -38,8 +38,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md p-8 rounded-xl shadow-md text-center">
+    <>
+      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-md text-center">
         <h1 className="text-2xl font-bold mb-6">Sign In</h1>
 
         <div className="space-y-3 mb-6">
@@ -122,6 +122,6 @@ export default function Login() {
           <a href="#" className="underline">Privacy Policy</a>.
         </p>
       </div>
-    </div>
+    </>
   );
 }
