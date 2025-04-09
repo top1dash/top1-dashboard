@@ -103,6 +103,7 @@ export default function SurveyInsightsRow({ surveyName, title, user, userRanking
 
   return (
     <>
+    <hr className="border-t border-gray-200 my-6" />
     <h2 className="text-xl font-semibold text-gray-800 mb-2">{title}</h2>
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-4 mb-8">
       {/* Filter Panel */}
