@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../supabaseClient";
+import { supabase } from "../../supabaseClient";
 import PostCard from "../../components/community/PostCard";
 import SidebarTopics from "../../components/community/SidebarTopics";
 
