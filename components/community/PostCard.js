@@ -1,53 +1,88 @@
-// components/PostCard.js
-import { useEffect, useState } from "react";
+// components/community/PostCard.js
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ThumbsUp, MessageCircle, Share2 } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Share } from "lucide-react";
 import { supabase } from "../../supabaseClient";
 
 export default function PostCard({ post }) {
-  // Safe fallback if any metadata is missing
-  const voteCount = post.vote_count ?? 0;
-  const replyCount = post.reply_count ?? 0;
-  const username = post.username || "Anonymous";
-  const topic = post.topic || "General";
+  const [userVote, setUserVote] = useState(null);
+
+  useEffect(() => {
+    const fetchVote = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) return;
+
+      const { data } = await supabase
+        .from("votes")
+        .select("value")
+        .eq("post_id", post.id)
+        .eq("user_id", user.id)
+        .single();
+
+      if (data) setUserVote(data.value);
+    };
+
+    fetchVote();
+  }, [post.id]);
+
+  const handleVote = async (value) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from("votes")
+      .upsert({ post_id: post.id, user_id: user.id, value }, { onConflict: ["post_id", "user_id"] });
+
+    if (!error) setUserVote(value);
+  };
+
+  const voteCount = (post.upvotes || 0) - (post.downvotes || 0);
+  const replyCount = post.replies || 0;
 
   return (
-    <div className="bg-white rounded-xl shadow p-6">
-      {/* Post Title */}
+    <div className="bg-white rounded-xl shadow p-6 space-y-3">
       <Link href={`/community/post/${post.id}`}>
-        <h3 className="text-xl font-semibold text-blue-700 hover:underline">
-          {post.title}
-        </h3>
+        <h3 className="text-xl font-semibold text-blue-700 hover:underline">{post.title}</h3>
       </Link>
 
-      {/* Meta Info */}
-      <p className="text-sm text-gray-600 mt-1">
-        Posted by{" "}
-        <span className="font-medium">@{username}</span> in{" "}
-        <span className="italic">{topic}</span>
+      <p className="text-sm text-gray-600">
+        Posted by <span className="font-medium">@{post.username || "Anonymous"}</span> in{" "}
+        <span className="italic">{post.topic || "General"}</span>
       </p>
 
-      {/* Content Preview */}
-      <p className="mt-4 text-gray-800 line-clamp-3">{post.content}</p>
+      <p className="text-gray-800">{post.content}</p>
 
-      {/* Footer Icons */}
-      <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
-        <div className="flex gap-4 items-center">
-          <div className="flex items-center gap-1">
-            <ThumbsUp size={16} />
-            <span>{voteCount}</span>
-          </div>
-
-          <div className="flex items-center gap-1">
-            <MessageCircle size={16} />
-            <span>{replyCount}</span>
-          </div>
+      <div className="flex items-center justify-between text-sm text-gray-500 pt-2 border-t">
+        <div className="flex items-center space-x-2">
+          <button
+            className={`hover:text-green-600 ${userVote === 1 ? "text-green-600" : ""}`}
+            onClick={() => handleVote(1)}
+          >
+            <ThumbsUp size={18} />
+          </button>
+          <span>{voteCount}</span>
+          <button
+            className={`hover:text-red-600 ${userVote === -1 ? "text-red-600" : ""}`}
+            onClick={() => handleVote(-1)}
+          >
+            <ThumbsDown size={18} />
+          </button>
         </div>
 
-        <button className="flex items-center gap-1 hover:text-blue-600">
-          <Share2 size={16} />
-          Share
-        </button>
+        <div className="flex items-center space-x-4">
+          <span>{replyCount} {replyCount === 1 ? "reply" : "replies"}</span>
+          <button
+            onClick={() => navigator.clipboard.writeText(`${window.location.origin}/community/post/${post.id}`)}
+            className="hover:text-blue-600"
+          >
+            <Share size={16} />
+          </button>
+        </div>
       </div>
     </div>
   );
