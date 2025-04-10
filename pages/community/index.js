@@ -34,10 +34,22 @@ export default function CommunityHome() {
 
       {/* Main content */}
       <main className="flex-1 space-y-6">
-        {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))}
-      </main>
+      <div className="text-right">
+        <Link
+          href="/community/new"
+          className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Create Post
+        </Link>
+      </div>
+    
+      {posts.length === 0 ? (
+        <p className="text-gray-500">No posts yet. Be the first to post!</p>
+      ) : (
+        posts.map((post) => <PostCard key={post.id} post={post} />)
+      )}
+    </main>
+
     </div>
   );
 }
