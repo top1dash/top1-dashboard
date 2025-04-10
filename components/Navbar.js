@@ -38,6 +38,11 @@ export default function Navbar() {
           Surveys
         </Link>
 
+         <Link href="/community" className="text-gray-700 hover:text-blue-600">
+         Community
+         </Link>
+
+
         {!session && (
           <>
             <Link href="/login" className="text-gray-700 hover:text-blue-600">
