@@ -1,12 +1,15 @@
 // components/PostCard.js
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ThumbsUp, ThumbsDown, MessageCircle, Share2 } from "lucide-react";
+import { ThumbsUp, MessageCircle, Share2 } from "lucide-react";
 import { supabase } from "../supabaseClient";
 
 export default function PostCard({ post }) {
-  const [voteCount, setVoteCount] = useState(post.vote_count || 0);
-  const [replyCount, setReplyCount] = useState(post.reply_count || 0);
+  // Safe fallback if any metadata is missing
+  const voteCount = post.vote_count ?? 0;
+  const replyCount = post.reply_count ?? 0;
+  const username = post.username || "Anonymous";
+  const topic = post.topic || "General";
 
   return (
     <div className="bg-white rounded-xl shadow p-6">
@@ -20,13 +23,11 @@ export default function PostCard({ post }) {
       {/* Meta Info */}
       <p className="text-sm text-gray-600 mt-1">
         Posted by{" "}
-        <span className="font-medium">
-          {post.username ? `@${post.username}` : "Anonymous"}
-        </span>{" "}
-        in <span className="italic">{post.topic}</span>
+        <span className="font-medium">@{username}</span> in{" "}
+        <span className="italic">{topic}</span>
       </p>
 
-      {/* Post Preview */}
+      {/* Content Preview */}
       <p className="mt-4 text-gray-800 line-clamp-3">{post.content}</p>
 
       {/* Footer Icons */}
