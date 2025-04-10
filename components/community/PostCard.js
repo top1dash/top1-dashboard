@@ -7,28 +7,33 @@ import { supabase } from "../../supabaseClient";
 export default function PostCard({ post }) {
   const [userVote, setUserVote] = useState(null);
 
+  const upvotes = post.upvotes || 0;
+  const downvotes = post.downvotes || 0;
+  const replies = post.replies || 0;
+
   useEffect(() => {
-    const fetchVote = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+    fetchUserVote();
+  }, []);
 
-      if (!user) return;
+  async function fetchUserVote() {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
 
-      const { data } = await supabase
-        .from("votes")
-        .select("value")
-        .eq("post_id", post.id)
-        .eq("user_id", user.id)
-        .single();
+    const { data } = await supabase
+      .from("votes")
+      .select("value")
+      .eq("post_id", post.id)
+      .eq("user_id", user.id)
+      .single();
 
-      if (data) setUserVote(data.value);
-    };
+    if (data) {
+      setUserVote(data.value);
+    }
+  }
 
-    fetchVote();
-  }, [post.id]);
-
-  const handleVote = async (value) => {
+  async function handleVote(value) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -36,53 +41,71 @@ export default function PostCard({ post }) {
 
     const { error } = await supabase
       .from("votes")
-      .upsert({ post_id: post.id, user_id: user.id, value }, { onConflict: ["post_id", "user_id"] });
+      .upsert(
+        { post_id: post.id, user_id: user.id, value },
+        { onConflict: "post_id,user_id" }
+      );
 
-    if (!error) setUserVote(value);
-  };
-
-  const voteCount = (post.upvotes || 0) - (post.downvotes || 0);
-  const replyCount = post.replies || 0;
+    if (!error) {
+      setUserVote(value);
+    }
+  }
 
   return (
     <div className="bg-white rounded-xl shadow p-6 space-y-3">
       <Link href={`/community/post/${post.id}`}>
-        <h3 className="text-xl font-semibold text-blue-700 hover:underline">{post.title}</h3>
+        <h3 className="text-xl font-semibold text-blue-700 hover:underline">
+          {post.title}
+        </h3>
       </Link>
 
       <p className="text-sm text-gray-600">
-        Posted by <span className="font-medium">@{post.username || "Anonymous"}</span> in{" "}
-        <span className="italic">{post.topic || "General"}</span>
+        Posted by{" "}
+        <span className="font-medium">
+          {post.username ? `@${post.username}` : "Anonymous"}
+        </span>{" "}
+        in <span className="italic">{post.topic || "Unknown Topic"}</span>
       </p>
 
       <p className="text-gray-800">{post.content}</p>
 
-      <div className="flex items-center justify-between text-sm text-gray-500 pt-2 border-t">
-        <div className="flex items-center space-x-2">
-          <button
-            className={`hover:text-green-600 ${userVote === 1 ? "text-green-600" : ""}`}
-            onClick={() => handleVote(1)}
-          >
-            <ThumbsUp size={18} />
-          </button>
-          <span>{voteCount}</span>
-          <button
-            className={`hover:text-red-600 ${userVote === -1 ? "text-red-600" : ""}`}
-            onClick={() => handleVote(-1)}
-          >
-            <ThumbsDown size={18} />
-          </button>
+      <div className="flex items-center space-x-4 pt-2 text-sm text-gray-600">
+        <button
+          onClick={() => handleVote(1)}
+          className={`flex items-center space-x-1 ${
+            userVote === 1 ? "text-blue-600 font-semibold" : ""
+          }`}
+        >
+          <ThumbsUp size={16} />
+          <span>{upvotes}</span>
+        </button>
+
+        <button
+          onClick={() => handleVote(-1)}
+          className={`flex items-center space-x-1 ${
+            userVote === -1 ? "text-red-600 font-semibold" : ""
+          }`}
+        >
+          <ThumbsDown size={16} />
+          <span>{downvotes}</span>
+        </button>
+
+        <div className="flex items-center space-x-1">
+          <span>💬</span>
+          <span>{replies}</span>
         </div>
 
-        <div className="flex items-center space-x-4">
-          <span>{replyCount} {replyCount === 1 ? "reply" : "replies"}</span>
-          <button
-            onClick={() => navigator.clipboard.writeText(`${window.location.origin}/community/post/${post.id}`)}
-            className="hover:text-blue-600"
-          >
-            <Share size={16} />
-          </button>
-        </div>
+        <button
+          onClick={() =>
+            navigator.clipboard.writeText(
+              `${window.location.origin}/community/post/${post.id}`
+            )
+          }
+          className="flex items-center space-x-1 hover:text-gray-800"
+        >
+          <Share size={16} />
+          <span>Share</span>
+        </button>
       </div>
     </div>
   );
