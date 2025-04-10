@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ThumbsUp, MessageCircle, Share2 } from "lucide-react";
-import { supabase } from "../supabaseClient";
+import { supabase } from "../../supabaseClient";
 
 export default function PostCard({ post }) {
   // Safe fallback if any metadata is missing
