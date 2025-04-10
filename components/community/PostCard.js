@@ -1,50 +1,23 @@
-// components/community/PostCard.js
+// components/PostCard.js
 import { useEffect, useState } from "react";
-import { supabase } from "../../supabaseClient";
 import Link from "next/link";
-import { ThumbsUp, ThumbsDown, Share2 } from "lucide-react";
+import { ThumbsUp, ThumbsDown, MessageCircle, Share2 } from "lucide-react";
+import { supabase } from "../supabaseClient";
 
 export default function PostCard({ post }) {
-  const [userVote, setUserVote] = useState(null);
-  const [session, setSession] = useState(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session) fetchVote(session.user.id);
-    });
-  }, []);
-
-  async function fetchVote(userId) {
-    const { data } = await supabase
-      .from("votes")
-      .select("value")
-      .eq("post_id", post.id)
-      .eq("user_id", userId)
-      .single();
-
-    if (data) setUserVote(data.value);
-  }
-
-  async function handleVote(value) {
-    if (!session) return;
-
-    const { error } = await supabase.from("votes").upsert({
-      user_id: session.user.id,
-      post_id: post.id,
-      value,
-    });
-
-    if (!error) setUserVote(value);
-  }
+  const [voteCount, setVoteCount] = useState(post.vote_count || 0);
+  const [replyCount, setReplyCount] = useState(post.reply_count || 0);
 
   return (
     <div className="bg-white rounded-xl shadow p-6">
+      {/* Post Title */}
       <Link href={`/community/post/${post.id}`}>
         <h3 className="text-xl font-semibold text-blue-700 hover:underline">
           {post.title}
         </h3>
       </Link>
+
+      {/* Meta Info */}
       <p className="text-sm text-gray-600 mt-1">
         Posted by{" "}
         <span className="font-medium">
@@ -52,35 +25,25 @@ export default function PostCard({ post }) {
         </span>{" "}
         in <span className="italic">{post.topic}</span>
       </p>
+
+      {/* Post Preview */}
       <p className="mt-4 text-gray-800 line-clamp-3">{post.content}</p>
 
-      {/* Footer row */}
+      {/* Footer Icons */}
       <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => handleVote(1)}
-            className={`flex items-center gap-1 ${
-              userVote === 1 ? "text-blue-600 font-semibold" : "text-gray-500"
-            }`}
-          >
+        <div className="flex gap-4 items-center">
+          <div className="flex items-center gap-1">
             <ThumbsUp size={16} />
-          </button>
+            <span>{voteCount}</span>
+          </div>
 
-          <span className="font-medium text-gray-800">
-            {post.vote_count ?? 0}
-          </span>
-
-          <button
-            onClick={() => handleVote(-1)}
-            className={`flex items-center gap-1 ${
-              userVote === -1 ? "text-red-600 font-semibold" : "text-gray-500"
-            }`}
-          >
-            <ThumbsDown size={16} />
-          </button>
+          <div className="flex items-center gap-1">
+            <MessageCircle size={16} />
+            <span>{replyCount}</span>
+          </div>
         </div>
 
-        <button className="flex items-center gap-1 text-gray-500 hover:text-blue-500">
+        <button className="flex items-center gap-1 hover:text-blue-600">
           <Share2 size={16} />
           Share
         </button>
