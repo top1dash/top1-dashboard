@@ -86,7 +86,7 @@ export default function Dashboard() {
         {loading ? (
           <p className="text-gray-500">Loading your data...</p>
         ) : (
-          surveyConfigs.map(({ survey_name, title }) => (
+          surveyConfigs.map(({ survey_name, title }, index) => (
             <SurveyInsightsRow
               key={survey_name}
               surveyName={survey_name}
