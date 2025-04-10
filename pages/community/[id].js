@@ -45,18 +45,27 @@ export default function PostDetail() {
   }
 
   async function handleSubmit(e) {
-    e.preventDefault();
-    if (!newReply.trim()) return;
+  e.preventDefault();
+  if (!newReply.trim()) return;
 
-    const { error } = await supabase.from("replies").insert({
-      post_id: id,
-      content: newReply,
-    });
-    if (!error) {
-      setNewReply("");
-      fetchReplies(); // Refresh list
-    }
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { error } = await supabase.from("replies").insert({
+    post_id: id,
+    content: newReply,
+    author_id: user?.id, // ✅ Fix: include author_id
+  });
+
+  if (error) {
+    console.error("Error posting reply:", error.message);
+  } else {
+    setNewReply("");
+    fetchReplies(); // ✅ Refresh the list
   }
+}
+
 
   if (!post) return <p className="p-6">Loading post...</p>;
 
