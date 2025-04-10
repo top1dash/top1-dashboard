@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
 import PostCard from "../../components/community/PostCard";
 import SidebarTopics from "../../components/community/SidebarTopics";
+import Link from "next/link";
+
 
 export default function CommunityHome() {
   const [posts, setPosts] = useState([]);
