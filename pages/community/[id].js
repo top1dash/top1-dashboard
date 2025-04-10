@@ -1,98 +1,95 @@
-import { useEffect, useState } from "react";
+// pages/community/[id].js
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
 
 export default function PostDetail() {
   const router = useRouter();
   const { id } = router.query;
-
   const [post, setPost] = useState(null);
   const [replies, setReplies] = useState([]);
   const [newReply, setNewReply] = useState("");
-  const [session, setSession] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    if (id) fetchData();
-    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    if (id) {
+      fetchPost();
+      fetchReplies();
+      fetchUser();
+    }
   }, [id]);
 
-  async function fetchData() {
-    const { data: postData } = await supabase
+  async function fetchPost() {
+    const { data, error } = await supabase
       .from("post_with_metadata")
       .select("*")
       .eq("id", id)
       .single();
-
-    const { data: replyData } = await supabase
-      .from("replies")
-      .select("*, profiles(username)")
-      .eq("post_id", id)
-      .order("created_at", { ascending: true });
-
-    setPost(postData);
-    setReplies(replyData || []);
+    if (!error) setPost(data);
   }
 
-  async function handleReplySubmit(e) {
-    e.preventDefault();
-    if (!newReply.trim()) return;
+  async function fetchReplies() {
+    const { data, error } = await supabase
+      .from("replies")
+      .select("id, content, created_at, author:profiles(username)")
+      .eq("post_id", id)
+      .order("created_at", { ascending: true });
+    if (!error) setReplies(data || []);
+  }
 
+  async function fetchUser() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
+    setUser(user);
+  }
 
-    const { error } = await supabase.from("replies").insert([
-      {
-        post_id: id,
-        author_id: user.id,
-        content: newReply.trim(),
-      },
-    ]);
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!newReply.trim()) return;
 
+    const { error } = await supabase.from("replies").insert({
+      post_id: id,
+      content: newReply,
+    });
     if (!error) {
       setNewReply("");
-      fetchData(); // refresh replies
+      fetchReplies(); // Refresh list
     }
   }
 
-  if (!post) return <div className="p-6 text-gray-500">Loading...</div>;
+  if (!post) return <p className="p-6">Loading post...</p>;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
+    <div className="max-w-2xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-1">{post.title}</h1>
       <p className="text-sm text-gray-500 mb-4">
-        Posted by {post.username || "Anonymous"} in{" "}
+        Posted by {post.username ? `@${post.username}` : "Anonymous"} in{" "}
         <span className="italic">{post.topic}</span>
       </p>
+      <p className="mb-6">{post.content}</p>
 
-      <div className="bg-white rounded shadow p-4 mb-8 whitespace-pre-wrap">
-        {post.content}
-      </div>
+      <hr className="my-6" />
 
-      <h2 className="text-lg font-semibold mb-2">Replies</h2>
-      <div className="space-y-4 mb-6">
-        {replies.length === 0 && (
-          <p className="text-gray-500">No replies yet. Start the conversation!</p>
-        )}
-        {replies.map((r) => (
-          <div key={r.id} className="bg-gray-50 border rounded p-3">
-            <div className="text-sm text-gray-600 mb-1">
-              {r.profiles?.username || "User"} ·{" "}
-              {new Date(r.created_at).toLocaleString()}
-            </div>
-            <div className="text-gray-800 whitespace-pre-wrap">{r.content}</div>
-          </div>
-        ))}
-      </div>
+      <h2 className="text-lg font-semibold mb-3">Replies</h2>
+      {replies.length === 0 && <p className="text-sm text-gray-500 mb-4">No replies yet.</p>}
+      {replies.map((r) => (
+        <div key={r.id} className="mb-4 border border-gray-200 rounded p-3">
+          <p className="text-sm text-gray-700">{r.content}</p>
+          <p className="text-xs text-gray-400 mt-1">
+            – {r.author?.username || "Anonymous"}, {new Date(r.created_at).toLocaleString()}
+          </p>
+        </div>
+      ))}
 
-      {session ? (
-        <form onSubmit={handleReplySubmit} className="space-y-2">
+      {user && (
+        <form onSubmit={handleSubmit} className="mt-6">
           <textarea
-            rows={3}
             value={newReply}
             onChange={(e) => setNewReply(e.target.value)}
-            placeholder="Write a reply..."
-            className="w-full border rounded p-2"
+            className="w-full p-2 border border-gray-300 rounded mb-2"
+            rows="3"
+            placeholder="Write your reply..."
           />
           <button
             type="submit"
@@ -101,13 +98,6 @@ export default function PostDetail() {
             Post Reply
           </button>
         </form>
-      ) : (
-        <p className="text-gray-600">
-          <a href="/login" className="text-blue-600 underline">
-            Log in
-          </a>{" "}
-          to reply.
-        </p>
       )}
     </div>
   );
