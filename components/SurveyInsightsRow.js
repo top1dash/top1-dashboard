@@ -5,7 +5,7 @@ import { BarChart2, ShieldCheck } from 'lucide-react';
 
 const FILTER_OPTIONS = ['all', 'age', 'zip code', 'city', 'state', 'country', 'school'];
 
-export default function SurveyInsightsRow({ surveyName, title, user, userRankings }) {
+export default function SurveyInsightsRow({ surveyName, title, user, userRankings, index = 0 }) {
   const [activeFilter, setActiveFilter] = useState('all');
   const [filtered, setFiltered] = useState(null);
   const [ranking, setRanking] = useState(null);
@@ -103,7 +103,7 @@ export default function SurveyInsightsRow({ surveyName, title, user, userRanking
 
   return (
     <>
-    <hr className="border-t border-gray-200 my-6" />
+    {index > 0 && <hr className="border-t border-gray-200 my-6" />}
     <h2 className="text-2xl font-semibold text-gray-900 mb-3">{title}</h2>
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-4 mb-8">
       {/* Filter Panel */}
