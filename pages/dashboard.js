@@ -102,6 +102,7 @@ export default function Dashboard() {
                 school: latestUser.school || null,
               }}
               userRankings={userRankings}
+              index={index} // 👈 this is what enables automatic divider hiding
             />
           ))
         )}
