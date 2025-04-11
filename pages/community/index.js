@@ -14,18 +14,18 @@ export default function CommunityHome() {
   }, []);
 
   async function fetchData() {
-    const { data: postData } = await supabase
-      .from("posts")
-      .select("id, title, content, created_at, author:profiles(username), topic:topics(name)")
-      .order("created_at", { ascending: false });
+  const { data: postData } = await supabase
+    .from("post_with_metadata")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-    const { data: topicData } = await supabase
-      .from("topics")
-      .select("id, name");
+  const { data: topicData } = await supabase
+    .from("topics")
+    .select("id, name");
 
-    setPosts(postData || []);
-    setTopics(topicData || []);
-  }
+  setPosts(postData || []);
+  setTopics(topicData || []);
+}
 
   return (
     <div className="flex min-h-screen bg-gray-50 px-4 py-6 md:px-12">
