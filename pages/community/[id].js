@@ -34,6 +34,9 @@ export default function PostDetail() {
       .select("id, content, created_at, author:profiles(username)")
       .eq("post_id", id)
       .order("created_at", { ascending: true });
+    
+    console.log("Fetched replies:", data);
+
     if (!error) setReplies(data || []);
   }
 
