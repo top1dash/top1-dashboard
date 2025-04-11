@@ -5,7 +5,7 @@ export default function Layout({ children, noBackground }) {
   return (
     <div className={`min-h-screen ${
       noBackground
-        ? 'bg-gray-100 dark:bg-gray-950'
+        ? 'bg-white dark:bg-gray-950'
         : 'bg-gray-100 dark:bg-gray-950 bg-[url("/top1percent2.jpg")] dark:bg-none bg-top bg-no-repeat bg-cover'
     } text-gray-900 dark:text-white`}>
       <Navbar />
