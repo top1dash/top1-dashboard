@@ -43,12 +43,16 @@ export default function PostCard({ post }) {
       .from("votes")
       .upsert(
         { post_id: post.id, user_id: user.id, value },
-        { onConflict: "post_id,user_id" }
+        { onConflict: ["post_id", "user_id"] }
       );
-
+    
+    if (error) {
+      console.error("Vote error:", error.message);
+    
     if (!error) {
       setUserVote(value);
     }
+    }  
   }
 
   return (
