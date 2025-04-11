@@ -34,26 +34,34 @@ export default function PostCard({ post }) {
   }
 
   async function handleVote(value) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { error } = await supabase
-      .from("votes")
-      .upsert(
-        { post_id: post.id, user_id: user.id, value },
-        { onConflict: ["post_id", "user_id"] }
-      );
-    
-    if (error) {
-      console.error("Vote error:", error.message);
-    
-    if (!error) {
-      setUserVote(value);
-    }
-    }  
-  }
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) return;
+      
+        const { error } = await supabase
+          .from("votes")
+          .upsert(
+            { post_id: post.id, user_id: user.id, value },
+            { onConflict: ["post_id", "user_id"] }
+          );
+      
+        if (!error) {
+          // Update local vote state
+          setUserVote(value);
+      
+          // Optimistically update post's vote counts
+          if (value === 1) {
+            post.upvotes = (post.upvotes || 0) + (userVote === -1 ? 2 : userVote === 1 ? 0 : 1);
+            if (userVote === -1) post.downvotes = Math.max((post.downvotes || 1) - 1, 0);
+          } else if (value === -1) {
+            post.downvotes = (post.downvotes || 0) + (userVote === 1 ? 2 : userVote === -1 ? 0 : 1);
+            if (userVote === 1) post.upvotes = Math.max((post.upvotes || 1) - 1, 0);
+          }
+        } else {
+          console.error("Vote error:", error.message);
+        }
+      }
 
   return (
     <div className="bg-white rounded-xl shadow p-6 space-y-3">
