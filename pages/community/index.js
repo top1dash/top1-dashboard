@@ -3,9 +3,10 @@ import { supabase } from "../../supabaseClient";
 import PostCard from "../../components/community/PostCard";
 import SidebarTopics from "../../components/community/SidebarTopics";
 import Link from "next/link";
+import Layout from "../../components/Layout";
 
 
-export default function CommunityHome() {
+function CommunityPage() {
   const [posts, setPosts] = useState([]);
   const [topics, setTopics] = useState([]);
 
@@ -55,3 +56,9 @@ export default function CommunityHome() {
     </div>
   );
 }
+
+CommunityPage.getLayout = (page) => (
+  <Layout noBackground={true}>{page}</Layout>
+); // ✅ Custom layout injection for this page only
+
+export default CommunityPage;
