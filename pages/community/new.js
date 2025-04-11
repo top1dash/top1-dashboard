@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "../../supabaseClient";
+import Layout from "../../components/Layout";
 
 export default function NewPost() {
   const [title, setTitle] = useState("");
