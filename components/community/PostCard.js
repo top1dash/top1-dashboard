@@ -53,7 +53,7 @@ export default function PostCard({ post }) {
 
   return (
     <div className="bg-white rounded-xl shadow p-6 space-y-3">
-      <Link href={`/community/post/${post.id}`}>
+      <Link href={`/community/${post.id}`}>
         <h3 className="text-xl font-semibold text-blue-700 hover:underline">
           {post.title}
         </h3>
