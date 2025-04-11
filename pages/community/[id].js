@@ -31,7 +31,7 @@ export default function PostDetail() {
   async function fetchReplies() {
     const { data, error } = await supabase
       .from("replies")
-      .select("id, content, created_at, author:profile(username)")
+      .select("id, content, created_at, author:profiles(username)")
       .eq("post_id", id)
       .order("created_at", { ascending: true });
     if (!error) setReplies(data || []);
