@@ -118,5 +118,3 @@ export default function PostDetail() {
 PostDetail.getLayout = (page) => (
   <Layout noBackground={true}>{page}</Layout>
 );
-
-export default PostDetail;
