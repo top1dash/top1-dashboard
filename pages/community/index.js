@@ -29,7 +29,7 @@ function CommunityPage() {
 }
 
   return (
-    <div className="bg-gray-50 px-4 py-6 md:px-12">
+    <div className="flex min-h-screen bg-gray-50 px-4 py-6 md:px-12">
       {/* Sidebar */}
       <aside className="w-64 mr-8 hidden lg:block">
         <SidebarTopics topics={topics} />
