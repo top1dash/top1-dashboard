@@ -2,6 +2,7 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
+import Layout from "../../components/Layout";
 
 export default function PostDetail() {
   const router = useRouter();
@@ -114,3 +115,8 @@ export default function PostDetail() {
     </div>
   );
 }
+PostDetail.getLayout = (page) => (
+  <Layout noBackground={true}>{page}</Layout>
+);
+
+export default PostDetail;
