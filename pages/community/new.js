@@ -92,6 +92,6 @@ export default function NewPost() {
     </div>
   );
 }
-PostDetail.getLayout = (page) => (
+NewPost.getLayout = (page) => (
   <Layout noBackground={true}>{page}</Layout>
 );
